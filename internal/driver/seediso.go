@@ -110,3 +110,44 @@ func (d *ESXiDriver) AttachSeedISO(vmUUID, isoName string) (*model.ZMessage, err
 	}
 	return &model.ZMessage{Success: true, Action: "SeedISO", Message: "cidata ISO 已挂载"}, nil
 }
+
+// GuestIPInjector 平台没有介质/串口通道时，通过平台工具直接注入地址。
+type GuestIPInjector interface {
+	InjectGuestIP(vmUUID string, nic model.NCConfig) (*model.ZMessage, error)
+}
+
+// maskToPrefixInt 把点分掩码转成前缀长度（1-32），非法按 24。
+func maskToPrefixInt(mask string) int {
+	mask = strings.TrimSpace(mask)
+	if mask == "" {
+		return 24
+	}
+	var a, b, c, e int
+	if n, err := fmt.Sscanf(mask, "%d.%d.%d.%d", &a, &b, &c, &e); n == 4 && err == nil {
+		ones := 0
+		for _, v := range []int{a, b, c, e} {
+			for bit := 7; bit >= 0; bit-- {
+				if v&(1<<bit) != 0 {
+					ones++
+				}
+			}
+		}
+		if ones > 0 && ones <= 32 {
+			return ones
+		}
+		return 24
+	}
+	if n, err := fmt.Sscanf(mask, "%d", &a); n == 1 && err == nil && a > 0 && a <= 32 {
+		return a
+	}
+	return 24
+}
+
+// 编译期确认各平台实现了通道接口，避免改动时静默丢能力。
+var (
+	_ SeedISOAttacher = (*ProxmoxDriver)(nil)
+	_ SeedISOAttacher = (*ESXiDriver)(nil)
+	_ SeedISOAttacher = (*HyperVDriver)(nil)
+	_ SeedISOAttacher = (*VirtualBoxDriver)(nil)
+	_ GuestIPInjector = (*MemuDriver)(nil)
+)

@@ -295,6 +295,11 @@ func (e *vmTaskExecutor) attachCidata(t *task.Task, cfg *model.VMConfig) {
 	uploader, canUpload := drv.(driver.ImageFileManager)
 	attacher, canAttach := drv.(driver.SeedISOAttacher)
 	if !canUpload || !canAttach {
+		// 没有光驱通道的平台（如安卓模拟器）：退回平台工具直接注入
+		if injector, ok := drv.(driver.GuestIPInjector); ok {
+			e.injectViaGuest(t, cfg, injector)
+			return
+		}
 		e.taskLog(t, "cidata 配置").VM(cfg.VmUUID, cfg.OsName).
 			Warn("虚拟机 %s 所在平台不支持挂载 cidata ISO，静态地址未能下发", cfg.VmUUID)
 		for name, nic := range cfg.NicAll {
@@ -369,6 +374,47 @@ func (e *vmTaskExecutor) attachCidata(t *task.Task, cfg *model.VMConfig) {
 	e.taskLog(t, "cidata 配置").VM(cfg.VmUUID, cfg.OsName).
 		Detail("iso", isoName).
 		Info("虚拟机 %s 已挂载 cidata ISO，开机后由客户插件配置静态地址", cfg.VmUUID)
+}
+
+// injectViaGuest 用平台工具（如安卓 adb）把静态地址直接写进实例。
+func (e *vmTaskExecutor) injectViaGuest(t *task.Task, cfg *model.VMConfig, injector driver.GuestIPInjector) {
+	applied, failed := 0, 0
+	for name, nic := range cfg.NicAll {
+		if nic.IPAssign != "static" {
+			continue
+		}
+		res, err := injector.InjectGuestIP(cfg.VmUUID, nic)
+		if err != nil || (res != nil && !res.Success) {
+			msg := "下发失败"
+			if res != nil && res.Message != "" {
+				msg = res.Message
+			}
+			if err != nil {
+				msg = err.Error()
+			}
+			nic.IP6State = "failed"
+			nic.IP6Applier = "adb"
+			nic.IP6Error = msg
+			cfg.NicAll[name] = nic
+			failed++
+			continue
+		}
+		nic.IP6State = "applied"
+		nic.IP6Applier = "adb"
+		nic.IP6Error = ""
+		cfg.NicAll[name] = nic
+		applied++
+	}
+	_ = e.app.DB.UpsertVMConfig(t.HsName, cfg.VmUUID, cfg)
+
+	ev := e.taskLog(t, "静态地址下发").VM(cfg.VmUUID, cfg.OsName).
+		Detail("applied", fmt.Sprintf("%d", applied)).
+		Detail("failed", fmt.Sprintf("%d", failed))
+	if failed > 0 {
+		ev.Warn("虚拟机 %s 静态地址下发失败 %d 张网卡", cfg.VmUUID, failed)
+		return
+	}
+	ev.Info("虚拟机 %s 静态地址已通过平台工具写入实例", cfg.VmUUID)
 }
 
 // netCheck 网卡地址分配（对应 Python BasicServer.NetCheck）。
