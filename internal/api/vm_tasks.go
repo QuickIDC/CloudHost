@@ -9,9 +9,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
+	"github.com/QuickIDC/HostAgent-Go/internal/cidata"
+	"github.com/QuickIDC/HostAgent-Go/internal/driver"
 	"github.com/QuickIDC/HostAgent-Go/internal/logger"
 	"github.com/QuickIDC/HostAgent-Go/internal/model"
 	"github.com/QuickIDC/HostAgent-Go/internal/service"
@@ -250,6 +253,9 @@ func (e *vmTaskExecutor) createVM(ctx context.Context, t *task.Task) error {
 	// 路由器静态绑定（爱快 DHCP 静态地址 + ARP），
 	// 对应 Python 版 VMCreate → IPBinder(True)。
 	// 路由器不可用不应让创建任务失败，仅记录告警。
+	// static 模式的地址靠 cidata（seed ISO）在实例内落地，必须在开机前挂好
+	e.attachCidata(t, cfg)
+
 	e.bindStatic(t, cfg)
 
 	e.taskLog(t, "创建虚拟机").VM(cfg.VmUUID, cfg.OsName).
@@ -260,6 +266,109 @@ func (e *vmTaskExecutor) createVM(ctx context.Context, t *task.Task) error {
 
 	_ = e.app.TaskManager.UpdateProgress(t.ID, 100, "创建完成")
 	return nil
+}
+
+// attachCidata 为 static 模式的网卡生成 cidata ISO 并挂到实例上。
+//
+// 地址不能靠 DHCP 拿（路由器关闭了 DHCP），也不能预置在镜像里（网段未知），
+// 所以把 hostagent-net.json + network-config 打进一张卷标 CIDATA 的 ISO，
+// 由实例内的客户插件在开机时读取并配置。
+func (e *vmTaskExecutor) attachCidata(t *task.Task, cfg *model.VMConfig) {
+	if cfg == nil || len(cfg.NicAll) == 0 {
+		return
+	}
+	need := false
+	for _, nic := range cfg.NicAll {
+		if nic.IPAssign == "static" {
+			need = true
+			break
+		}
+	}
+	if !need {
+		return
+	}
+
+	drv := e.app.HostSvc.GetDriver(t.HsName)
+	if drv == nil {
+		return
+	}
+	uploader, canUpload := drv.(driver.ImageFileManager)
+	attacher, canAttach := drv.(driver.SeedISOAttacher)
+	if !canUpload || !canAttach {
+		e.taskLog(t, "cidata 配置").VM(cfg.VmUUID, cfg.OsName).
+			Warn("虚拟机 %s 所在平台不支持挂载 cidata ISO，静态地址未能下发", cfg.VmUUID)
+		for name, nic := range cfg.NicAll {
+			if nic.IPAssign == "static" {
+				nic.IP6State = "failed"
+				nic.IP6Error = "平台不支持 cidata ISO 挂载"
+				cfg.NicAll[name] = nic
+			}
+		}
+		_ = e.app.DB.UpsertVMConfig(t.HsName, cfg.VmUUID, cfg)
+		return
+	}
+
+	files, err := cidata.Files(cfg)
+	if err != nil {
+		e.taskLog(t, "cidata 配置").VM(cfg.VmUUID, cfg.OsName).Err(err).
+			Warn("生成 cidata 内容失败: %v", err)
+		return
+	}
+	tmp, err := os.CreateTemp("", "hostagent-cidata-*.iso")
+	if err != nil {
+		e.taskLog(t, "cidata 配置").VM(cfg.VmUUID, cfg.OsName).Err(err).
+			Warn("创建临时文件失败: %v", err)
+		return
+	}
+	tmpPath := tmp.Name()
+	_ = tmp.Close()
+	defer os.Remove(tmpPath)
+
+	if err := cidata.WriteISO(tmpPath, files); err != nil {
+		e.taskLog(t, "cidata 配置").VM(cfg.VmUUID, cfg.OsName).Err(err).
+			Warn("打包 cidata ISO 失败: %v", err)
+		return
+	}
+	isoName := "cidata-" + cfg.VmUUID + ".iso"
+	f, err := os.Open(tmpPath)
+	if err != nil {
+		e.taskLog(t, "cidata 配置").VM(cfg.VmUUID, cfg.OsName).Err(err).
+			Warn("读取临时 ISO 失败: %v", err)
+		return
+	}
+	defer f.Close()
+	if _, err := uploader.UploadImageFile("iso", isoName, f); err != nil {
+		e.taskLog(t, "cidata 配置").VM(cfg.VmUUID, cfg.OsName).Err(err).
+			Warn("上传 cidata ISO 到主机失败: %v", err)
+		return
+	}
+	res, err := attacher.AttachSeedISO(cfg.VmUUID, isoName)
+	if err != nil || (res != nil && !res.Success) {
+		msg := ""
+		if res != nil {
+			msg = res.Message
+		}
+		if err != nil {
+			msg = err.Error()
+		}
+		e.taskLog(t, "cidata 配置").VM(cfg.VmUUID, cfg.OsName).
+			Warn("挂载 cidata ISO 失败: %s", msg)
+		return
+	}
+
+	for name, nic := range cfg.NicAll {
+		if nic.IPAssign == "static" {
+			nic.IP6State = "pending"
+			nic.IP6Applier = "cidata"
+			nic.IP6Error = ""
+			cfg.NicAll[name] = nic
+		}
+	}
+	_ = e.app.DB.UpsertVMConfig(t.HsName, cfg.VmUUID, cfg)
+
+	e.taskLog(t, "cidata 配置").VM(cfg.VmUUID, cfg.OsName).
+		Detail("iso", isoName).
+		Info("虚拟机 %s 已挂载 cidata ISO，开机后由客户插件配置静态地址", cfg.VmUUID)
 }
 
 // netCheck 网卡地址分配（对应 Python BasicServer.NetCheck）。

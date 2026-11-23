@@ -9,9 +9,8 @@ import (
 
 // WriteISO 把 cidata 内容打包成 ISO。
 //
-// 优先用 cloud-localds（和 QEMU 驱动同一套工具），再退回 genisoimage /
-// mkisofs / xorriso；都不可用时返回明确错误，由调用方记录并继续创建
-// （不能因为打包失败让虚拟机创建不出来）。
+// 用 genisoimage / mkisofs / xorriso 打包（三者任选其一），卷标取 VolumeLabel；
+// 都不可用时返回明确错误，由调用方记录并继续创建，不让虚拟机创建失败。
 func WriteISO(outPath string, files map[string][]byte) error {
 	if len(files) == 0 {
 		return fmt.Errorf("cidata 内容为空")
@@ -37,11 +36,9 @@ func WriteISO(outPath string, files map[string][]byte) error {
 		args []string
 	}
 	attempts := []attempt{
-		{"cloud-localds", []string{outPath, filepath.Join(dir, "user-data"), filepath.Join(dir, "meta-data"),
-			"--network-config=" + filepath.Join(dir, "network-config")}},
-		{"genisoimage", []string{"-quiet", "-volid", "cidata", "-joliet", "-rock", "-output", outPath, dir}},
-		{"mkisofs", []string{"-quiet", "-volid", "cidata", "-joliet", "-rock", "-output", outPath, dir}},
-		{"xorriso", []string{"-as", "mkisofs", "-volid", "cidata", "-joliet", "-rock", "-o", outPath, dir}},
+		{"genisoimage", []string{"-quiet", "-volid", VolumeLabel, "-joliet", "-rock", "-output", outPath, dir}},
+		{"mkisofs", []string{"-quiet", "-volid", VolumeLabel, "-joliet", "-rock", "-output", outPath, dir}},
+		{"xorriso", []string{"-as", "mkisofs", "-volid", VolumeLabel, "-joliet", "-rock", "-o", outPath, dir}},
 	}
 
 	var lastErr error
@@ -61,7 +58,7 @@ func WriteISO(outPath string, files map[string][]byte) error {
 		lastErr = fmt.Errorf("%s 未生成文件", a.bin)
 	}
 	if lastErr == nil {
-		return fmt.Errorf("未找到可用的 ISO 打包工具（需要 cloud-localds、genisoimage、mkisofs 或 xorriso 之一）")
+		return fmt.Errorf("未找到可用的 ISO 打包工具（需要 genisoimage、mkisofs 或 xorriso 之一）")
 	}
 	return fmt.Errorf("打包 cidata ISO 失败: %w", lastErr)
 }
