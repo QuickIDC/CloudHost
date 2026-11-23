@@ -7,7 +7,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // DecodeVMConfig 解析数据库中的虚拟机配置。

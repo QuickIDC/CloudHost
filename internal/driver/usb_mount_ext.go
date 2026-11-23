@@ -13,7 +13,7 @@ import (
 	proxmox "github.com/luthermonson/go-proxmox"
 	"github.com/vmware/govmomi/vim25/types"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // ============================================================

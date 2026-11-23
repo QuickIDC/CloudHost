@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/appconfig"
+	"github.com/QuickIDC/HostAgent-Go/internal/appconfig"
 )
 
 var dataDirOverride string

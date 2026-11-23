@@ -13,7 +13,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // vboxDataDiskPath 返回数据盘的 VDI 路径（与 MountHDD 保持一致）

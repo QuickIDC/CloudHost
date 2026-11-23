@@ -7,8 +7,8 @@ import (
 	"log"
 	"sync"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/data"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/data"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // VMCleanupService VM资源清理服务

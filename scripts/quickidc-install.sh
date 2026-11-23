@@ -12,7 +12,7 @@
 # ============================================================================
 set -euo pipefail
 
-REPO="${QUICKIDC_REPO:-OpenIDCSTeam/CloudHost}"
+REPO="${QUICKIDC_REPO:-QuickIDC/CloudHost}"
 DOWNLOAD_BASE="${QUICKIDC_DOWNLOAD_BASE:-}"
 CHANNEL="stable"
 VERSION=""
@@ -29,7 +29,7 @@ usage() {
   --help, -h                   显示帮助
 
 环境变量：
-  QUICKIDC_REPO            GitHub 仓库，默认 OpenIDCSTeam/CloudHost
+  QUICKIDC_REPO            GitHub 仓库，默认 QuickIDC/CloudHost
   QUICKIDC_DOWNLOAD_BASE   自定义下载前缀（镜像），形如 https://mirror.example.com/quickidc
 EOF
 }

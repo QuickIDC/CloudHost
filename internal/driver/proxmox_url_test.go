@@ -3,7 +3,7 @@ package driver
 import (
 	"testing"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // TestProxmoxBaseURL 覆盖 Proxmox 地址归一化。

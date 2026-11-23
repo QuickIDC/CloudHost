@@ -3,7 +3,7 @@ package driver
 import (
 	"testing"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // TestPowerStatusMapIntermediate 中间态必须可映射：

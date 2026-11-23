@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/driver"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/driver"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // Proxmox 的 VNC 必须走 vncwebsocket 通道：

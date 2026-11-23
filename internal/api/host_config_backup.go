@@ -7,8 +7,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/service"
-	"github.com/OpenIDCSTeam/HostAgent-Go/pkg/utils"
+	"github.com/QuickIDC/HostAgent-Go/internal/service"
+	"github.com/QuickIDC/HostAgent-Go/pkg/utils"
 )
 
 func (app *App) handleHostConfigExport(c *gin.Context) {

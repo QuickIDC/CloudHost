@@ -19,10 +19,10 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/auth"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/service"
-	"github.com/OpenIDCSTeam/HostAgent-Go/pkg/utils"
+	"github.com/QuickIDC/HostAgent-Go/internal/auth"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/service"
+	"github.com/QuickIDC/HostAgent-Go/pkg/utils"
 )
 
 // ============================================================

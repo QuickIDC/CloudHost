@@ -12,9 +12,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/data"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/driver"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/data"
+	"github.com/QuickIDC/HostAgent-Go/internal/driver"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // NATService NAT / DHCP / ARP 下发服务

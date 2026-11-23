@@ -15,7 +15,7 @@ package driver
 import (
 	"fmt"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // MemuRepairItem 单个磁盘目录的 ACL 检查结果

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // SupportsSnapshot VirtualBox 提供原生快照

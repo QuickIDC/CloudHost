@@ -15,15 +15,15 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/api"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/appconfig"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/data"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/driver"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/logger"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/paths"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/scheduler"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/security"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/service"
+	"github.com/QuickIDC/HostAgent-Go/internal/api"
+	"github.com/QuickIDC/HostAgent-Go/internal/appconfig"
+	"github.com/QuickIDC/HostAgent-Go/internal/data"
+	"github.com/QuickIDC/HostAgent-Go/internal/driver"
+	"github.com/QuickIDC/HostAgent-Go/internal/logger"
+	"github.com/QuickIDC/HostAgent-Go/internal/paths"
+	"github.com/QuickIDC/HostAgent-Go/internal/scheduler"
+	"github.com/QuickIDC/HostAgent-Go/internal/security"
+	"github.com/QuickIDC/HostAgent-Go/internal/service"
 )
 
 var (

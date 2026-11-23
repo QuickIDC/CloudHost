@@ -6,10 +6,10 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/OpenIDCSTeam/HostAgent"><img src="https://img.shields.io/github/stars/OpenIDCSTeam/HostAgent?style=social" alt="Stars"></a>
-  <a href="https://github.com/OpenIDCSTeam/HostAgent"><img src="https://img.shields.io/github/forks/OpenIDCSTeam/HostAgent?style=social" alt="Forks"></a>
-  <a href="https://github.com/OpenIDCSTeam/HostAgent/issues"><img src="https://img.shields.io/github/issues/OpenIDCSTeam/HostAgent" alt="Issues"></a>
-  <a href="https://github.com/OpenIDCSTeam/HostAgent/blob/main/LICENSE"><img src="https://img.shields.io/github/license/OpenIDCSTeam/HostAgent" alt="License"></a>
+  <a href="https://github.com/QuickIDC/HostAgent"><img src="https://img.shields.io/github/stars/QuickIDC/HostAgent?style=social" alt="Stars"></a>
+  <a href="https://github.com/QuickIDC/HostAgent"><img src="https://img.shields.io/github/forks/QuickIDC/HostAgent?style=social" alt="Forks"></a>
+  <a href="https://github.com/QuickIDC/HostAgent/issues"><img src="https://img.shields.io/github/issues/QuickIDC/HostAgent" alt="Issues"></a>
+  <a href="https://github.com/QuickIDC/HostAgent/blob/main/LICENSE"><img src="https://img.shields.io/github/license/QuickIDC/HostAgent" alt="License"></a>
 </p>
 <p align="center"><a href="ProjectDoc/APIDOC_ALL.md">📚 API文档</a> | <a href="ProjectDoc/DEPLOYMENT.md">🚀 部署指南</a> | <a href="ProjectDoc/PROJECT_OVERVIEW.md">🏗️ 项目架构</a></p>
 
@@ -91,7 +91,7 @@ OpenIDC-Client是一个开源的IDC（Internet Data Center）虚拟化统一管�
 
 ## 🚀 快速开始
 
-项目提供三种开箱即用的部署方式，均从 [Releases](https://github.com/OpenIDCSTeam/IDCClient/releases) 获取预编译二进制，目标机无需 Go / Python 环境。
+项目提供三种开箱即用的部署方式，均从 [Releases](https://github.com/QuickIDC/IDCClient/releases) 获取预编译二进制，目标机无需 Go / Python 环境。
 
 ### Linux 一键安装（推荐）
 
@@ -122,7 +122,7 @@ sudo bash install.sh --uninstall   # 卸载（保留数据）
 
 ### Windows 安装（Inno Setup）
 
-1. 从 [Releases](https://github.com/OpenIDCSTeam/CloudHost/releases) 下载
+1. 从 [Releases](https://github.com/QuickIDC/CloudHost/releases) 下载
    `QuickIDC-HostAgent-<版本>-win-x64-setup.exe`。
 2. 双击安装，安装器会通过 NSSM 注册系统服务 `QuickIDC-HostAgent`（LocalSystem，
    开机自启，异常自动重启），并可选放行 1881 / 6080 / 7681 端口。
@@ -183,7 +183,7 @@ sudo installer -pkg BuildCache/QuickIDC-HostAgent-1.0.0-macos-arm64.pkg -target 
 
 #### 克隆项目
 ```bash
-git clone https://github.com/OpenIDCSTeam/IDCClient.git
+git clone https://github.com/QuickIDC/IDCClient.git
 cd CloudHost
 ```
 
@@ -434,9 +434,9 @@ log:
 
 ## 📞 联系我们
 
-- **项目主页**: https://github.com/OpenIDCSTeam/HostAgent
-- **问题反馈**: https://github.com/OpenIDCSTeam/HostAgent/issues
-- **讨论交流**: https://gitter.im/OpenIDCSTeam/community
+- **项目主页**: https://github.com/QuickIDC/HostAgent
+- **问题反馈**: https://github.com/QuickIDC/HostAgent/issues
+- **讨论交流**: https://gitter.im/QuickIDC/community
 - **邮箱联系**: quickidc@team.org
 
 ---

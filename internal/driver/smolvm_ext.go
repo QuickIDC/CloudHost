@@ -16,7 +16,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // smolvmRestart 重启 microVM（kill → 重新拉起 firecracker → FC API 装配）

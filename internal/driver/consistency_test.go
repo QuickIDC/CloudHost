@@ -16,7 +16,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // registeredEngineTypes 全部已注册的虚拟化引擎类型（与 engine_config.go 保持一致）

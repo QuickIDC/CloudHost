@@ -212,7 +212,7 @@ func installWindows(opt Options) error {
 	dir := filepath.Dir(exe)
 	matches, _ := filepath.Glob(filepath.Join(dir, "QuickIDC-HostAgent-*-setup.exe"))
 	if len(matches) == 0 {
-		return errors.New("未找到安装包：请从 https://github.com/OpenIDCSTeam/CloudHost/releases 下载 setup.exe 后运行")
+		return errors.New("未找到安装包：请从 https://github.com/QuickIDC/CloudHost/releases 下载 setup.exe 后运行")
 	}
 	cmd := exec.Command(matches[0])
 	cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr

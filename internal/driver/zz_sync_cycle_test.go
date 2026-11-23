@@ -5,7 +5,7 @@ package driver
 import (
 	"testing"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // TestManualSyncCycle 模拟调度器一轮：GetPower → SetVMPowerState → Crontab，

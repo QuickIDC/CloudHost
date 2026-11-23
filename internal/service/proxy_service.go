@@ -19,10 +19,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/data"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/driver"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/security"
+	"github.com/QuickIDC/HostAgent-Go/internal/data"
+	"github.com/QuickIDC/HostAgent-Go/internal/driver"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/security"
 )
 
 // ProxyService 反向代理下发服务

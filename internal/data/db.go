@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/appconfig"
+	"github.com/QuickIDC/HostAgent-Go/internal/appconfig"
 
 	// 纯 Go 实现的 SQLite 驱动：不依赖 CGO，CGO_ENABLED=0 也可正常工作，
 	// 同时支持从任意平台交叉编译出 linux/windows/darwin 单文件二进制。

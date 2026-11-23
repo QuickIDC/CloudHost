@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // writeFakeExecutable 在临时目录写入占位可执行文件

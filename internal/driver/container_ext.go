@@ -14,7 +14,7 @@ package driver
 import (
 	"fmt"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // ============================================================

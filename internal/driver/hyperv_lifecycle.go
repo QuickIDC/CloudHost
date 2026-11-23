@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/security"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/security"
 )
 
 // execPS 执行 PowerShell 命令

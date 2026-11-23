@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // execLXC 执行 lxc 命令（远程主机通过 SSH 在远端执行）

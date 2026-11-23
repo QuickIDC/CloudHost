@@ -29,7 +29,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/data"
+	"github.com/QuickIDC/HostAgent-Go/internal/data"
 )
 
 const (

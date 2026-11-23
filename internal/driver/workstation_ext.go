@@ -19,8 +19,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/security"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/security"
 )
 
 // vmrunBin 解析 vmrun 可执行文件路径：优先 launch_path，其次 PATH，

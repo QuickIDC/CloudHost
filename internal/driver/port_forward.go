@@ -21,8 +21,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/security"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/security"
 )
 
 // PortForwardEntry 一条 socat 端口转发记录

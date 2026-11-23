@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // newFakeVMRest 启动一个最小 vmrest 服务：两台虚拟机，只有 vmw-abc 匹配前缀

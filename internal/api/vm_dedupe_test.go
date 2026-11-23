@@ -3,7 +3,7 @@ package api
 import (
 	"testing"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // TestVMConfigScore 校验「保留哪条记录」的评分：有业务数据的一条应高于空壳记录

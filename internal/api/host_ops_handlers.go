@@ -13,9 +13,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/driver"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
-	"github.com/OpenIDCSTeam/HostAgent-Go/pkg/utils"
+	"github.com/QuickIDC/HostAgent-Go/internal/driver"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/pkg/utils"
 )
 
 // hostOps 取主机运维能力

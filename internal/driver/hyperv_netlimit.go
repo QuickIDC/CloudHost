@@ -23,7 +23,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // hvLimitInterval 全量同步最小间隔，避免每轮状态采集都去枚举网卡。

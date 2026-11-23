@@ -7,10 +7,10 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/data"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/driver"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/logger"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/service"
+	"github.com/QuickIDC/HostAgent-Go/internal/data"
+	"github.com/QuickIDC/HostAgent-Go/internal/driver"
+	"github.com/QuickIDC/HostAgent-Go/internal/logger"
+	"github.com/QuickIDC/HostAgent-Go/internal/service"
 )
 
 const (

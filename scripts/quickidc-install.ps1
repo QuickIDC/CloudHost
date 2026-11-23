@@ -18,7 +18,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$repo = if ($env:QUICKIDC_REPO) { $env:QUICKIDC_REPO } else { "OpenIDCSTeam/CloudHost" }
+$repo = if ($env:QUICKIDC_REPO) { $env:QUICKIDC_REPO } else { "QuickIDC/CloudHost" }
 $downloadBase = $env:QUICKIDC_DOWNLOAD_BASE
 $arch = switch ([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture) {
     "X64" { "amd64" }

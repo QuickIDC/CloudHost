@@ -28,9 +28,9 @@ import (
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/transform"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/paths"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/security"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/paths"
+	"github.com/QuickIDC/HostAgent-Go/internal/security"
 )
 
 // memuKeyPrefix 虚拟机标识前缀（与 Python 版 f"memu_{index}" 一致）

@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/data"
+	"github.com/QuickIDC/HostAgent-Go/internal/data"
 )
 
 // MockExecutor 模拟执行器

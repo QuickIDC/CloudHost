@@ -3,7 +3,7 @@ package api
 import (
 	"testing"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // 历史虚拟机没有 efi_all 时，应生成「系统盘 → 数据盘 → 光驱 → 网卡」的默认列表，

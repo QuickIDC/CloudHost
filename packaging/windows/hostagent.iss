@@ -21,8 +21,8 @@
 #endif
 
 #define AppName "QuickIDC HostAgent"
-#define AppPublisher "OpenIDCSTeam"
-#define AppURL "https://github.com/OpenIDCSTeam/CloudHost"
+#define AppPublisher "QuickIDC"
+#define AppURL "https://github.com/QuickIDC/CloudHost"
 #define ServiceName "QuickIDC-HostAgent"
 #define ServiceDisplayName "QuickIDC HostAgent"
 

@@ -16,8 +16,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/data"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/data"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // IPAllocService IP 地址分配服务

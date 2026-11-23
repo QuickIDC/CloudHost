@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // hvDataDiskPath 返回数据盘的 VHDX 路径（与 MountHDD 保持一致）

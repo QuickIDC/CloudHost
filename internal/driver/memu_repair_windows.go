@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/security"
+	"github.com/QuickIDC/HostAgent-Go/internal/security"
 )
 
 // memuVMGroupSid Hyper-V 虚拟机账户 SID（NT VIRTUAL MACHINE\Virtual Machines）

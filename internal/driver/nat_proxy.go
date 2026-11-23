@@ -1,6 +1,6 @@
 package driver
 
-import "github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+import "github.com/QuickIDC/HostAgent-Go/internal/model"
 
 // NatPortProvider 平台自有的「端口映射」下发能力。
 //

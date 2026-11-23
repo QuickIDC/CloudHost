@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/data"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/data"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // newTestIPAllocService 构造带临时库的 IP 分配服务。

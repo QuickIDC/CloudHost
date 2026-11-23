@@ -27,7 +27,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/security"
+	"github.com/QuickIDC/HostAgent-Go/internal/security"
 )
 
 // readFileAsDataURL 读取本地图片文件并转成 data URL

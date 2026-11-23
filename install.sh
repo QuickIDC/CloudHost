@@ -19,7 +19,7 @@
 set -euo pipefail
 
 # ======================== 配置 ========================
-REPO="OpenIDCSTeam/CloudHost"
+REPO="QuickIDC/CloudHost"
 SERVICE_NAME="quickidc"
 PREFIX="/opt/quickidc"
 DATA_DIR="/var/lib/quickidc"

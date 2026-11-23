@@ -11,11 +11,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/cli/client"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/cli/config"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/cli/output"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/cli/service"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/cli/tui"
+	"github.com/QuickIDC/HostAgent-Go/internal/cli/client"
+	"github.com/QuickIDC/HostAgent-Go/internal/cli/config"
+	"github.com/QuickIDC/HostAgent-Go/internal/cli/output"
+	"github.com/QuickIDC/HostAgent-Go/internal/cli/service"
+	"github.com/QuickIDC/HostAgent-Go/internal/cli/tui"
 )
 
 var (

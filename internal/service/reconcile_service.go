@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/data"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/data"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // maxOutboxAttempts 补偿任务的最大尝试次数，超过后标记为最终失败并等待人工处理

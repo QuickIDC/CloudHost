@@ -1,6 +1,6 @@
 package service
 
-import "github.com/OpenIDCSTeam/HostAgent-Go/internal/driver"
+import "github.com/QuickIDC/HostAgent-Go/internal/driver"
 
 // PlatformCaps 描述平台支持哪些「免重启」操作。
 //

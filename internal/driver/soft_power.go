@@ -14,7 +14,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // 监控参数（与 Python 版一致：间隔 5 秒，最长 5 分钟）

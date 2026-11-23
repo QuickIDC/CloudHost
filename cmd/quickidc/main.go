@@ -4,7 +4,7 @@ package main
 import (
 	"os"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/cli/cmd"
+	"github.com/QuickIDC/HostAgent-Go/internal/cli/cmd"
 )
 
 func main() {

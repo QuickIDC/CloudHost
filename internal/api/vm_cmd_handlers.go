@@ -7,8 +7,8 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/auth"
-	"github.com/OpenIDCSTeam/HostAgent-Go/pkg/utils"
+	"github.com/QuickIDC/HostAgent-Go/internal/auth"
+	"github.com/QuickIDC/HostAgent-Go/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )

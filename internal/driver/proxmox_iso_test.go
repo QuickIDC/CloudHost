@@ -3,7 +3,7 @@ package driver
 import (
 	"testing"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // PVE 的 ISO 卷 ID 必须是 storage:iso/<file>。

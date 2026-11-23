@@ -3,7 +3,7 @@ package driver
 import (
 	"testing"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // TestMatchFilterPrefix 覆盖「记录是否匹配 filter_name 前缀」的判定。

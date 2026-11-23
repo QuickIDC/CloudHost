@@ -10,7 +10,7 @@ package service
 import (
 	"encoding/json"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // MergeRemoteVMs 将远端虚拟机数据智能合并进本地主机

@@ -14,7 +14,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/data"
+	"github.com/QuickIDC/HostAgent-Go/internal/data"
 )
 
 // SyncService 主机间自动同步服务

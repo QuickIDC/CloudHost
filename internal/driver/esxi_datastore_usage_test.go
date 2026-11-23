@@ -3,7 +3,7 @@ package driver
 import (
 	"testing"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // TestESXiDatastoreName 覆盖主机配置里各种存储路径写法的数据存储名解析。

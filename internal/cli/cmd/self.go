@@ -13,11 +13,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/cli/config"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/cli/version"
+	"github.com/QuickIDC/HostAgent-Go/internal/cli/config"
+	"github.com/QuickIDC/HostAgent-Go/internal/cli/version"
 )
 
-const releaseAPI = "https://api.github.com/repos/OpenIDCSTeam/CloudHost/releases/latest"
+const releaseAPI = "https://api.github.com/repos/QuickIDC/CloudHost/releases/latest"
 
 type releaseInfo struct {
 	TagName string `json:"tag_name"`

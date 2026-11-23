@@ -17,8 +17,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/data"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/data"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // DeleteVMWorkflow 虚拟机删除工作流（幂等，可重复执行）

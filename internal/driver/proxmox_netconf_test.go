@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // TestProxmoxNetConf 覆盖 PVE 网卡配置生成（对应 Python ProxmoxQemu.net_conf）。

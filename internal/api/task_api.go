@@ -7,9 +7,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/auth"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/task"
-	"github.com/OpenIDCSTeam/HostAgent-Go/pkg/utils"
+	"github.com/QuickIDC/HostAgent-Go/internal/auth"
+	"github.com/QuickIDC/HostAgent-Go/internal/task"
+	"github.com/QuickIDC/HostAgent-Go/pkg/utils"
 )
 
 // maxTaskPageSize 单页最大任务数，避免全量拉取

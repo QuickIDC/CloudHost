@@ -3,7 +3,7 @@ package api
 import (
 	"testing"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // 前端部分页面发送语义值（start/stop/hard_stop/...），驱动只认

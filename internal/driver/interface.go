@@ -2,7 +2,7 @@
 package driver
 
 import (
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // HostDriver 虚拟化平台驱动接口

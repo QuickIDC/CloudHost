@@ -3,7 +3,7 @@ package api
 import (
 	"strings"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/pkg/utils"
+	"github.com/QuickIDC/HostAgent-Go/pkg/utils"
 	"github.com/gin-gonic/gin"
 )
 

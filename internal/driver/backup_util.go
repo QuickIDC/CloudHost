@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/security"
+	"github.com/QuickIDC/HostAgent-Go/internal/security"
 )
 
 // archiveTimeout 打包/解包超时（大磁盘镜像可能耗时较长）

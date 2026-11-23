@@ -1,4 +1,4 @@
-module github.com/OpenIDCSTeam/HostAgent-Go
+module github.com/QuickIDC/HostAgent-Go
 
 go 1.26.0
 

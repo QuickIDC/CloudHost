@@ -16,7 +16,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 const vboxNatRulePrefix = "oidcs-"

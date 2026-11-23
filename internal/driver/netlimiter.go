@@ -29,7 +29,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // errNetLimiterUnsupported 非 Windows 平台不支持 NetLimiter 限速驱动。

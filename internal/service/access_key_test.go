@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/data"
+	"github.com/QuickIDC/HostAgent-Go/internal/data"
 )
 
 // newTestDB 创建临时数据库（测试结束后自动清理）

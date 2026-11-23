@@ -15,7 +15,7 @@ package driver
 import (
 	"fmt"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // portsMapTTY 容器专用端口映射（对齐 Python BasicServer.PortsMap_TTY）

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/security"
+	"github.com/QuickIDC/HostAgent-Go/internal/security"
 )
 
 // SupportsSnapshot VMware Workstation 提供原生快照（vmrun）

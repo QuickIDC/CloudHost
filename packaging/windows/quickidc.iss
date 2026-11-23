@@ -16,7 +16,7 @@
 #endif
 #define AppName "quickidc"
 #define AppPublisher "QuickIDC Team"
-#define AppURL "https://github.com/OpenIDCSTeam/CloudHost"
+#define AppURL "https://github.com/QuickIDC/CloudHost"
 #define GuiExe "..\..\tools\quickidc-gui\src-tauri\target\release\quickidc-gui.exe"
 #define CliExe "..\..\tools\quickidc-gui\src-tauri\binaries\quickidc-x86_64-pc-windows-msvc.exe"
 

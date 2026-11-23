@@ -3,7 +3,7 @@ REM HostAgent-Go 构建脚本 (Windows)
 REM 用法: build.bat [linux|windows|darwin]
 
 set BINARY=hostagent
-set MODULE=github.com/OpenIDCSTeam/HostAgent-Go
+set MODULE=github.com/QuickIDC/HostAgent-Go
 set MAIN=./cmd/server
 
 REM SQLite 驱动为纯 Go 实现，关闭 CGO 可免装 C 工具链并支持交叉编译

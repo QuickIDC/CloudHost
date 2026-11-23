@@ -17,7 +17,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
 )
 
 // VMStats 单个虚拟机的实时用量（列表页展示用）

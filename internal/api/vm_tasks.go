@@ -12,10 +12,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/logger"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/service"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/task"
+	"github.com/QuickIDC/HostAgent-Go/internal/logger"
+	"github.com/QuickIDC/HostAgent-Go/internal/model"
+	"github.com/QuickIDC/HostAgent-Go/internal/service"
+	"github.com/QuickIDC/HostAgent-Go/internal/task"
 )
 
 // 任务参数键名（对应 Python 版 _submit_async 的 params）

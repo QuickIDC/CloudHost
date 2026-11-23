@@ -18,13 +18,13 @@ import (
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/auth"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/data"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/i18n"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/logger"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/middleware"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/service"
-	"github.com/OpenIDCSTeam/HostAgent-Go/internal/task"
+	"github.com/QuickIDC/HostAgent-Go/internal/auth"
+	"github.com/QuickIDC/HostAgent-Go/internal/data"
+	"github.com/QuickIDC/HostAgent-Go/internal/i18n"
+	"github.com/QuickIDC/HostAgent-Go/internal/logger"
+	"github.com/QuickIDC/HostAgent-Go/internal/middleware"
+	"github.com/QuickIDC/HostAgent-Go/internal/service"
+	"github.com/QuickIDC/HostAgent-Go/internal/task"
 )
 
 // sessionSecretGlobalKey 会话签名密钥在 hs_global 表中的键名

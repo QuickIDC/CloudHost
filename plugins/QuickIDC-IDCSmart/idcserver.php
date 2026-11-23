@@ -22,7 +22,7 @@ function idcserver_MetaData()
     return [
         'DisplayName' => '魔方财务-QuickIDC对接模块',
         'APIVersion'  => '0.0.1',
-        'HelpDoc'     => 'https://github.com/OpenIDCSTeam/QuickIDC-Client',
+        'HelpDoc'     => 'https://github.com/QuickIDC/QuickIDC-Client',
     ];
 }
 
