@@ -1,0 +1,59 @@
+name: Publish install scripts
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - install.sh
+      - scripts/quickidc-install.sh
+      - scripts/quickidc-install.ps1
+      - pages/**
+      - CNAME
+      - .github/workflows/pages.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-install
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Assemble site
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Assemble site
+        run: |
+          mkdir -p _site
+          cp install.sh _site/install.sh
+          cp scripts/quickidc-install.sh _site/quickidc-install.sh
+          cp scripts/quickidc-install.ps1 _site/quickidc-install.ps1
+          cp pages/index.html _site/index.html
+          cp CNAME _site/CNAME
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

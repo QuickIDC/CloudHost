@@ -96,7 +96,7 @@ OpenIDC-Client是一个开源的IDC（Internet Data Center）虚拟化统一管�
 ### Linux 一键安装（推荐）
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/OpenIDCSTeam/IDCClient/main/install.sh | sudo bash
+curl -fsSL https://idcgit.opkg.cn/install.sh | sudo bash
 ```
 
 脚本会按 CPU 架构下载对应的 Release 二进制，安装程序到 `/opt/quickidc`、数据到

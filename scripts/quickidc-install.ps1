@@ -2,7 +2,7 @@
 # quickidc 一键安装（Windows）
 #
 #   稳定版：
-#     irm https://raw.githubusercontent.com/OpenIDCSTeam/CloudHost/main/scripts/quickidc-install.ps1 | iex
+#     irm https://idcgit.opkg.cn/quickidc-install.ps1 | iex
 #   测试版：
 #     & ([scriptblock]::Create((irm .../quickidc-install.ps1))) -Channel beta
 #   指定版本 / 目录 / 离线包：

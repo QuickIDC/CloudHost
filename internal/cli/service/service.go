@@ -232,7 +232,7 @@ func installScript() (string, func(), error) {
 		}
 	}
 
-	url := "https://raw.githubusercontent.com/OpenIDCSTeam/CloudHost/main/install.sh"
+	url := "https://idcgit.opkg.cn/install.sh"
 	client := &http.Client{Timeout: 60 * time.Second}
 	resp, err := client.Get(url)
 	if err != nil {

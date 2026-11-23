@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quick IDC 安装脚本</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; min-height: 100vh; display: grid; place-items: center; background: #f6f8fc; color: #0f1b2d; }
+  main { width: min(720px, 92vw); padding: 32px; background: #fff; border-radius: 14px; box-shadow: 0 12px 32px rgba(15, 27, 45, .08); }
+  h1 { margin: 0 0 8px; font-size: 22px; }
+  p { margin: 0 0 18px; color: #5a6b85; font-size: 14px; line-height: 1.7; }
+  pre { margin: 0 0 10px; padding: 12px 14px; background: #0f1b2d; color: #e8eefc; border-radius: 10px; overflow-x: auto; font-size: 13px; }
+  code { font-family: "JetBrains Mono", Consolas, monospace; }
+  a { color: #2f6bff; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Quick IDC 安装脚本</h1>
+  <p>本域名只提供主控安装脚本的短链接。源码与发布包见 <a href="https://github.com/OpenIDCSTeam/CloudHost">OpenIDCSTeam/CloudHost</a>。</p>
+  <pre><code>curl -fsSL https://idcgit.opkg.cn/install.sh | sudo bash</code></pre>
+  <pre><code>curl -fsSL https://idcgit.opkg.cn/quickidc-install.sh | sh</code></pre>
+  <pre><code>irm https://idcgit.opkg.cn/quickidc-install.ps1 | iex</code></pre>
+</main>
+</body>
+</html>

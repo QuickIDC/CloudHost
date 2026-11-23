@@ -3,7 +3,7 @@
 # quickidc 一键安装（Linux / macOS）
 #
 #   稳定版：
-#     curl -fsSL https://raw.githubusercontent.com/OpenIDCSTeam/CloudHost/main/scripts/quickidc-install.sh | sh
+#     curl -fsSL https://idcgit.opkg.cn/quickidc-install.sh | sh
 #   测试版（beta 通道，随 main 自动构建）：
 #     curl -fsSL .../quickidc-install.sh | sh -s -- --channel beta
 #   指定版本 / 目录 / 离线包：

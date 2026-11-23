@@ -3,7 +3,7 @@
 # QuickIDC HostAgent (Go) Linux 一键安装脚本
 #
 # 在线安装（默认最新正式版）:
-#   curl -fsSL https://raw.githubusercontent.com/OpenIDCSTeam/CloudHost/main/install.sh | sudo bash
+#   curl -fsSL https://idcgit.opkg.cn/install.sh | sudo bash
 #
 # 指定版本 / 端口 / 目录:
 #   sudo bash install.sh --version v1.0.0 --port 1881
