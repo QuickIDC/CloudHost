@@ -284,7 +284,7 @@ func TestAllocateIPv6SingleAddress(t *testing.T) {
 	}}
 	allocated := map[string]bool{}
 
-	ip, gate, mask, ok := allocateIP(pools, "ipv6", "pub", allocated)
+	ip, gate, mask, _, ok := allocateIP(pools, "ipv6", "pub", allocated)
 	if !ok {
 		t.Fatal("/128 池应能分配出唯一地址")
 	}
@@ -299,7 +299,7 @@ func TestAllocateIPv6SingleAddress(t *testing.T) {
 	}
 
 	allocated[ip] = true
-	if _, _, _, ok := allocateIP(pools, "ipv6", "pub", allocated); ok {
+	if _, _, _, _, ok := allocateIP(pools, "ipv6", "pub", allocated); ok {
 		t.Error("/128 只有一个地址，不应继续分配下一个地址")
 	}
 }
@@ -312,17 +312,17 @@ func TestAllocateIPv6StopsAtPrefixBoundary(t *testing.T) {
 	}}
 	allocated := map[string]bool{}
 
-	if ip, _, _, ok := allocateIP(pools, "ipv6", "pub", allocated); !ok || ip != "2408:8207:1234:5600::fffe" {
+	if ip, _, _, _, ok := allocateIP(pools, "ipv6", "pub", allocated); !ok || ip != "2408:8207:1234:5600::fffe" {
 		t.Fatalf("第一个地址应为 ::fffe，实际 %q ok=%v", ip, ok)
 	}
 	allocated["2408:8207:1234:5600::fffe"] = true
 
-	if ip, _, _, ok := allocateIP(pools, "ipv6", "pub", allocated); !ok || ip != "2408:8207:1234:5600::ffff" {
+	if ip, _, _, _, ok := allocateIP(pools, "ipv6", "pub", allocated); !ok || ip != "2408:8207:1234:5600::ffff" {
 		t.Fatalf("第二个地址应为 ::ffff，实际 %q ok=%v", ip, ok)
 	}
 	allocated["2408:8207:1234:5600::ffff"] = true
 
-	if ip, _, _, ok := allocateIP(pools, "ipv6", "pub", allocated); ok {
+	if ip, _, _, _, ok := allocateIP(pools, "ipv6", "pub", allocated); ok {
 		t.Errorf("已越出 /112 网段，不应继续分配，实际又给出 %q", ip)
 	}
 }
@@ -330,7 +330,7 @@ func TestAllocateIPv6StopsAtPrefixBoundary(t *testing.T) {
 // 分配 IPv6 时要把地址池里的网关写进网卡，静态配置才有默认路由。
 func TestNetCheckFillsIPv6Gate(t *testing.T) {
 	const pools = `{"pub6":{"from":"240e:3b0:1234:5600::2","nums":2,"type":"pub","vers":"ipv6",` +
-		`"gate":"240e:3b0:1234:5600::1","prefix":128}}`
+		`"gate":"240e:3b0:1234:5600::1","prefix":128,"assign":"static","dns6":["2400:3200::1"]}}`
 	svc := newTestIPAllocService(t, pools)
 	vm := &model.VMConfig{
 		VmUUID: "vm-1",
@@ -412,5 +412,40 @@ func TestIPv6EndToEndAllocateAndBind(t *testing.T) {
 	}
 	if strVal(p["suffix"]) != nic.IPv6Suffix() {
 		t.Errorf("下发的后缀应为 %q，实际 %q", nic.IPv6Suffix(), strVal(p["suffix"]))
+	}
+}
+
+// DHCP 模式 + 非 /64：爱快只能按前缀+后缀下发，必须直接报错。
+func TestNetCheckRejectsDHCPNon64Pool(t *testing.T) {
+	const pools = `{"pub6":{"from":"240e:3b0:1234:5600::2","nums":2,"type":"pub","vers":"ipv6",` +
+		`"gate":"240e:3b0:1234:5600::1","prefix":128}}`
+	svc := newTestIPAllocService(t, pools)
+	vm := &model.VMConfig{VmUUID: "vm-1", NicAll: map[string]model.NCConfig{
+		"ethernet0": {NicName: "ethernet0", NicType: "pub"},
+	}}
+	err := svc.NetCheck("h1", vm)
+	if err == nil || !strings.Contains(err.Error(), "仅支持 /64") {
+		t.Fatalf("DHCP + /128 应报错，实际 %v", err)
+	}
+}
+
+// static 模式：/96 允许，分配方式与 IPv6 DNS 回填到网卡。
+func TestNetCheckStaticPoolAllowsSmallPrefix(t *testing.T) {
+	const pools = `{"pub6":{"from":"240e:3b0:1234:5600::2","nums":2,"type":"pub","vers":"ipv6",` +
+		`"gate":"240e:3b0:1234:5600::1","prefix":96,"assign":"static",` +
+		`"dns6":["2400:3200::1","240e:3b0::53"]}}`
+	svc := newTestIPAllocService(t, pools)
+	vm := &model.VMConfig{VmUUID: "vm-1", NicAll: map[string]model.NCConfig{
+		"ethernet0": {NicName: "ethernet0", NicType: "pub"},
+	}}
+	if err := svc.NetCheck("h1", vm); err != nil {
+		t.Fatalf("static + /96 应允许: %v", err)
+	}
+	nic := vm.NicAll["ethernet0"]
+	if nic.IPAssign != "static" {
+		t.Errorf("分配方式应回填 static，实际 %q", nic.IPAssign)
+	}
+	if len(nic.IP6DNS) != 2 || nic.IP6DNS[0] != "2400:3200::1" {
+		t.Errorf("IPv6 DNS 未回填: %v", nic.IP6DNS)
 	}
 }

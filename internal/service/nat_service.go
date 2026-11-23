@@ -473,7 +473,14 @@ func (s *NATService) BindStaticForVM(hsName, vmUUID string, vm *model.VMConfig) 
 
 		// IPv6 走 DHCPv6 静态分配：MAC + 接口标识后缀，
 		// 与 IPv4 的 DHCP 静态地址是两张表，必须分别下发。
-		if ip6 != "" {
+		//
+		// 只有 dhcp 模式且前缀 /64 才下发：static 模式由 seed ISO 在实例内配好，
+		// 再让爱快按后缀发一次会出现两个地址；非 /64 爱快也表达不了。
+		if ip6 != "" && nic.IPAssign == "static" {
+			res.Skipped = append(res.Skipped, fmt.Sprintf("%s(IPv6 static 模式由 seed ISO 下发)", item.Name))
+		} else if ip6 != "" && nic.IPv6PrefixLen() != 64 {
+			res.Skipped = append(res.Skipped, fmt.Sprintf("%s(IPv6 /%d 需静态下发)", item.Name, nic.IPv6PrefixLen()))
+		} else if ip6 != "" {
 			if err := s.BindStaticV6(hsName, vmUUID, ip6, mac); err != nil {
 				errs = append(errs, fmt.Sprintf("%s(%s): %v", ip6, mac, err))
 			} else {

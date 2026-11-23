@@ -44,6 +44,10 @@ type ipPool struct {
 	Gate   string
 	Mask   string
 	Prefix int // IPv6 前缀长度
+	// Assign 分配方式：dhcp（爱快 DHCP）/ static（seed ISO 静态下发），缺省 dhcp
+	Assign string
+	// DNS6 IPv6 DNS 服务器列表
+	DNS6 []string
 }
 
 // NetCheck 检查并自动分配虚拟机网卡 IP（对应 Python BasicServer.NetCheck）
@@ -120,7 +124,7 @@ func (s *IPAllocService) NetCheck(hsName string, vm *model.VMConfig) error {
 		// 例外：主机只配置了 IPv6 池时属于纯 IPv6 网络，跳过 IPv4 分配；
 		// 套餐已不允许该侧 IPv4 时同样跳过，避免超出配额。
 		if needV4 && allowV4 && (hasV4Pool || !hasV6Pool) {
-			ip, gate, mask, ok := allocateIP(pools, "ipv4", nicType, allocated)
+			ip, gate, mask, pool, ok := allocateIP(pools, "ipv4", nicType, allocated)
 			if !ok {
 				return fmt.Errorf(
 					"无法为网卡 %s 分配IPv4地址（类型: %s）：地址池已耗尽或未配置对应网段",
@@ -135,6 +139,9 @@ func (s *IPAllocService) NetCheck(hsName string, vm *model.VMConfig) error {
 			}
 			allocated[ip] = true
 			usedV4[kind]++
+			if pool != nil {
+				nic.IPAssign = pool.Assign
+			}
 			if len(dns) > 0 {
 				nic.DNSAddr = append([]string(nil), dns...)
 			}
@@ -142,8 +149,22 @@ func (s *IPAllocService) NetCheck(hsName string, vm *model.VMConfig) error {
 
 		// 分配 IPv6：失败不报错（与 Python 一致）
 		if needV6 && allowV6 {
-			if ip, gate, prefix, ok := allocateIP(pools, "ipv6", nicType, allocated); ok {
+			if ip, gate, prefix, pool, ok := allocateIP(pools, "ipv6", nicType, allocated); ok {
+				// DHCP 模式：爱快只能按「前缀 + 后缀」下发，前缀必须是 /64；
+				// 其它前缀要么改 static，要么根本没法和池里地址对上。
+				if pool != nil && pool.Assign == "dhcp" && pool.Prefix > 0 && pool.Prefix != 64 {
+					return fmt.Errorf(
+						"网卡 %s 的 IPv6 地址池前缀为 /%d，DHCP 模式仅支持 /64；"+
+							"要分配 /%d 请把地址池分配方式改为 static",
+						name, pool.Prefix, pool.Prefix)
+				}
 				nic.IP6Addr = ip
+				if pool != nil {
+					nic.IPAssign = pool.Assign
+					if len(pool.DNS6) > 0 {
+						nic.IP6DNS = append([]string(nil), pool.DNS6...)
+					}
+				}
 				if strings.TrimSpace(nic.IP6Gate) == "" && gate != "" {
 					nic.IP6Gate = gate
 				}
@@ -211,6 +232,8 @@ func parseIPPools(raw interface{}) []ipPool {
 			Gate:   strValue(item["gate"]),
 			Mask:   strValue(item["mask"]),
 			Prefix: poolPrefix(item),
+			Assign: poolAssign(item),
+			DNS6:   parseDNSList(item["dns6"]),
 		})
 	}
 	return pools
@@ -229,6 +252,39 @@ func poolPrefix(item map[string]interface{}) int {
 		return v
 	}
 	return 0
+}
+
+// poolAssign 解析地址池的分配方式，缺省为 dhcp（兼容旧配置）。
+func poolAssign(item map[string]interface{}) string {
+	if strings.ToLower(strings.TrimSpace(strValue(item["assign"]))) == "static" {
+		return "static"
+	}
+	return "dhcp"
+}
+
+// parseDNSList 解析地址池的 DNS 列表（dns6），支持数组与逗号分隔字符串。
+func parseDNSList(raw interface{}) []string {
+	var out []string
+	switch v := raw.(type) {
+	case []string:
+		out = append(out, v...)
+	case []interface{}:
+		for _, item := range v {
+			if s := strings.TrimSpace(strValue(item)); s != "" {
+				out = append(out, s)
+			}
+		}
+	case string:
+		for _, part := range strings.Split(v, ",") {
+			if s := strings.TrimSpace(part); s != "" && s != "[]" {
+				out = append(out, s)
+			}
+		}
+	}
+	if len(out) == 0 {
+		return nil
+	}
+	return out
 }
 
 // parseIPDNS 解析主机 ipaddr_ddns
@@ -268,8 +324,9 @@ func hasPoolVers(pools []ipPool, vers string) bool {
 }
 
 // allocateIP 从地址池中分配一个未占用的 IP（对应 Python IPConfig.allocate_ip）
-func allocateIP(pools []ipPool, vers, nicType string, allocated map[string]bool) (ip, gate, mask string, ok bool) {
-	for _, pool := range pools {
+func allocateIP(pools []ipPool, vers, nicType string, allocated map[string]bool) (ip, gate, mask string, pool *ipPool, ok bool) {
+	for i := range pools {
+		pool := &pools[i]
 		if pool.Vers != vers || pool.Type != nicType {
 			continue
 		}
@@ -311,11 +368,11 @@ func allocateIP(pools []ipPool, vers, nicType string, allocated map[string]bool)
 			}
 			ipStr := candidate.String()
 			if !allocated[ipStr] {
-				return ipStr, pool.Gate, mask, true
+				return ipStr, pool.Gate, mask, pool, true
 			}
 		}
 	}
-	return "", "", "", false
+	return "", "", "", nil, false
 }
 
 // ipv6InPrefix 判断 ip 与 base 是否落在同一个 /prefix 网段内。

@@ -58,6 +58,16 @@ type NCConfig struct {
 	// IP6Gate IPv6 网关。IPv4 网关沿用 NicGate，IPv6 单独存一份，
 	// 静态配置时写进实例的默认路由（::/0）。
 	IP6Gate string `json:"ip6_gate"`
+	// IP6DNS IPv6 DNS 服务器列表（来自地址池 dns6）
+	IP6DNS []string `json:"ip6_dns,omitempty"`
+	// IPAssign 地址分配方式：dhcp（爱快 DHCP）/ static（seed ISO 静态下发）
+	IPAssign string `json:"ip_assign,omitempty"`
+	// IP6State 静态配置状态：pending / applied / failed
+	IP6State string `json:"ip6_state,omitempty"`
+	// IP6Applier 落地方式：cidata（seed ISO）/ serial
+	IP6Applier string `json:"ip6_applier,omitempty"`
+	// IP6Error 失败原因
+	IP6Error string `json:"ip6_error,omitempty"`
 }
 
 // EffectiveNicType 返回生效的网卡类型，缺省为 nat（与 Python 版一致）
