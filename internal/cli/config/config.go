@@ -1,4 +1,4 @@
-// Package config 管理 opidcs 的多主控配置。
+// Package config 管理 quickidc 的多主控配置。
 package config
 
 import (
@@ -31,7 +31,7 @@ func Path() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("无法定位用户配置目录: %w", err)
 	}
-	return filepath.Join(dir, "opidcs", "config.yaml"), nil
+	return filepath.Join(dir, "quickidc", "config.yaml"), nil
 }
 
 // Load 读取配置，文件不存在时返回空配置。
@@ -116,7 +116,7 @@ func (f *File) Resolve(name string) (Core, error) {
 		return f.Cores[0], nil
 	}
 	if name == "" {
-		return Core{}, errors.New("未指定主控：请使用 --core、--url/--token，或先执行 opidcs host add --name <name> --addr <url> --token <token>")
+		return Core{}, errors.New("未指定主控：请使用 --core、--url/--token，或先执行 quickidc host add --name <name> --addr <url> --token <token>")
 	}
 	if n, err := strconv.Atoi(name); err == nil {
 		if n < 0 || n >= len(f.Cores) {

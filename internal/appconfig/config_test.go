@@ -39,7 +39,7 @@ func TestSaveLoadRoundTrip(t *testing.T) {
 	cfg.Server.Port = 9000
 	cfg.Database.Driver = "mysql"
 	cfg.Database.MySQL.Host = "db.internal"
-	cfg.Database.MySQL.Database = "openidcs"
+	cfg.Database.MySQL.Database = "quickidc"
 	cfg.Log.DB = "warn"
 	if err := Save(path, cfg); err != nil {
 		t.Fatal(err)
@@ -55,11 +55,11 @@ func TestSaveLoadRoundTrip(t *testing.T) {
 
 func TestDSNString(t *testing.T) {
 	sqlite := DatabaseConfig{Driver: "sqlite"}
-	driver, dsn, err := sqlite.DSNString("/var/lib/openidcs")
+	driver, dsn, err := sqlite.DSNString("/var/lib/quickidc")
 	if err != nil || driver != "sqlite" {
 		t.Fatalf("sqlite dsn: %s %s %v", driver, dsn, err)
 	}
-	if !strings.HasSuffix(dsn, filepath.Join("var/lib/openidcs", "data.db")) && !strings.HasSuffix(dsn, "data.db") {
+	if !strings.HasSuffix(dsn, filepath.Join("var/lib/quickidc", "data.db")) && !strings.HasSuffix(dsn, "data.db") {
 		t.Fatalf("sqlite 路径异常: %s", dsn)
 	}
 
@@ -67,7 +67,7 @@ func TestDSNString(t *testing.T) {
 		Host: "127.0.0.1", Port: 3306, User: "u", Password: "p", Database: "d", Params: "charset=utf8mb4",
 	}}
 	driver, dsn, err = mysql.DSNString(".")
-	if err != nil || driver != "opidcs-mysql" {
+	if err != nil || driver != "quickidc-mysql" {
 		t.Fatalf("mysql dsn: %s %v", driver, err)
 	}
 	if dsn != "u:p@tcp(127.0.0.1:3306)/d?charset=utf8mb4" {
@@ -78,7 +78,7 @@ func TestDSNString(t *testing.T) {
 		Host: "db", Port: 5432, User: "u", Password: "p", Database: "d", SSLMode: "require",
 	}}
 	driver, dsn, err = pg.DSNString(".")
-	if err != nil || driver != "opidcs-postgres" {
+	if err != nil || driver != "quickidc-postgres" {
 		t.Fatalf("pg dsn: %s %v", driver, err)
 	}
 	if !strings.Contains(dsn, "postgres://u:p@db:5432/d") || !strings.Contains(dsn, "sslmode=require") {
@@ -91,8 +91,8 @@ func TestDSNString(t *testing.T) {
 }
 
 func TestApplyEnv(t *testing.T) {
-	t.Setenv("OPIDCS_PORT", "1999")
-	t.Setenv("OPIDCS_DB_DRIVER", "pg")
+	t.Setenv("QUICKIDC_PORT", "1999")
+	t.Setenv("QUICKIDC_DB_DRIVER", "pg")
 	cfg := Default()
 	cfg.ApplyEnv()
 	if cfg.Server.Port != 1999 || cfg.Database.Driver != "postgres" {

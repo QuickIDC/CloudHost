@@ -44,7 +44,7 @@ func loadSessionSecret(db *data.DB) []byte {
 	if _, err := rand.Read(secret); err != nil {
 		// 随机源不可用属于极端异常：退化为进程内确定值，
 		// 会话在重启后失效，但不会退化成可预测的公开常量。
-		sum := sha256.Sum256([]byte(fmt.Sprintf("openidcs-session-%d", time.Now().UnixNano())))
+		sum := sha256.Sum256([]byte(fmt.Sprintf("quickidc-session-%d", time.Now().UnixNano())))
 		log.Printf("[session] 生成会话密钥失败，本次启动使用临时密钥: %v", err)
 		return sum[:]
 	}
@@ -58,9 +58,9 @@ func loadSessionSecret(db *data.DB) []byte {
 
 // cookieSecure 会话 Cookie 是否只在 HTTPS 链路回传。
 // HTTP 部署（默认）必须关闭，否则浏览器不会回传 Cookie，登录失去会话；
-// HTTPS 部署应设置 OPENIDCS_COOKIE_SECURE=1。
+// HTTPS 部署应设置 QUICKIDC_COOKIE_SECURE=1。
 func cookieSecure() bool {
-	switch strings.ToLower(strings.TrimSpace(os.Getenv("OPENIDCS_COOKIE_SECURE"))) {
+	switch strings.ToLower(strings.TrimSpace(os.Getenv("QUICKIDC_COOKIE_SECURE"))) {
 	case "1", "true", "yes", "on":
 		return true
 	default:
@@ -227,7 +227,7 @@ func NewApp(db *data.DB, dataDir string) *App {
 	//
 	// Secure 属性不能无条件开启：默认部署是 http://<ip>:8080，一旦给 Cookie
 	// 打上 Secure，浏览器会拒绝回传，登录会直接失效。HTTPS 部署时通过
-	// OPENIDCS_COOKIE_SECURE=1 打开，防止会话 Cookie 在明文链路中泄露。
+	// QUICKIDC_COOKIE_SECURE=1 打开，防止会话 Cookie 在明文链路中泄露。
 	store := cookie.NewStore(loadSessionSecret(db))
 	store.Options(sessions.Options{
 		Path:     "/",
@@ -236,7 +236,7 @@ func NewApp(db *data.DB, dataDir string) *App {
 		Secure:   cookieSecure(),
 		SameSite: http.SameSiteLaxMode,
 	})
-	r.Use(sessions.Sessions("openidcs_session", store))
+	r.Use(sessions.Sessions("quickidc_session", store))
 
 	app.Router = r
 	app.registerRoutes()

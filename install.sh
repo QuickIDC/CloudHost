@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 # ============================================================================
-# OpenIDCS HostAgent (Go) Linux 一键安装脚本
+# QuickIDC HostAgent (Go) Linux 一键安装脚本
 #
 # 在线安装（默认最新正式版）:
 #   curl -fsSL https://raw.githubusercontent.com/OpenIDCSTeam/CloudHost/main/install.sh | sudo bash
 #
 # 指定版本 / 端口 / 目录:
 #   sudo bash install.sh --version v1.0.0 --port 1881
-#   sudo bash install.sh --version beta --dir /opt/openidcs
+#   sudo bash install.sh --version beta --dir /opt/quickidc
 #
 # 离线安装（使用 CI 产物 hostagent-linux-amd64.tar.gz）:
 #   sudo bash install.sh --file ./hostagent-linux-amd64.tar.gz
 #
-# 卸载（默认保留 /var/lib/openidcs 数据）:
+# 卸载（默认保留 /var/lib/quickidc 数据）:
 #   sudo bash install.sh --uninstall
 #   sudo bash install.sh --uninstall --purge    # 连同数据一起删除
 # ============================================================================
@@ -20,9 +20,9 @@ set -euo pipefail
 
 # ======================== 配置 ========================
 REPO="OpenIDCSTeam/CloudHost"
-SERVICE_NAME="openidcs"
-PREFIX="/opt/openidcs"
-DATA_DIR="/var/lib/openidcs"
+SERVICE_NAME="quickidc"
+PREFIX="/opt/quickidc"
+DATA_DIR="/var/lib/quickidc"
 BIN_LINK="/usr/local/bin/hostagent"
 UNIT_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
 DEFAULT_PORT="1881"
@@ -182,7 +182,7 @@ EOF
     fi
     cat > "${UNIT_FILE}" <<EOF
 [Unit]
-Description=OpenIDCS HostAgent (Go)
+Description=QuickIDC HostAgent (Go)
 Documentation=https://github.com/${REPO}
 After=network-online.target docker.service
 Wants=network-online.target
@@ -230,7 +230,7 @@ EOF
         | grep -oE '(API|Bearer) Token: .*' | tail -1 | sed -E 's/(API|Bearer) Token: //' || true)"
 
     echo ""
-    echo -e "${GREEN}OpenIDCS HostAgent 安装完成${NC}"
+    echo -e "${GREEN}QuickIDC HostAgent 安装完成${NC}"
     echo -e "  安装目录: ${CYAN}${PREFIX}${NC}"
     echo -e "  数据目录: ${CYAN}${DATA_DIR}${NC}"
     echo -e "  访问地址: ${CYAN}http://${ip:-127.0.0.1}:${PORT}${NC}"

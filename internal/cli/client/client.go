@@ -1,4 +1,4 @@
-// Package client 是 opidcs 使用的 REST 客户端。
+// Package client 是 quickidc 使用的 REST 客户端。
 package client
 
 import (

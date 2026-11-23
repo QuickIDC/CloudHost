@@ -30,7 +30,7 @@ type releaseInfo struct {
 func newSelfCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "self",
-		Short: "opidcs 自身维护",
+		Short: "quickidc 自身维护",
 	}
 	cmd.AddCommand(newVersionCmd(), newUpdateCmd(), newUninstallCmd())
 	return cmd
@@ -44,7 +44,7 @@ func newSelfAliases() []*cobra.Command {
 func newVersionCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "version",
-		Short: "显示 opidcs 版本",
+		Short: "显示 quickidc 版本",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Println(version.String())
 			return nil
@@ -57,7 +57,7 @@ func newUpdateCmd() *cobra.Command {
 	var channel string
 	cmd := &cobra.Command{
 		Use:   "update",
-		Short: "更新 opidcs（stable / beta 通道）",
+		Short: "更新 quickidc（stable / beta 通道）",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			channel = strings.ToLower(strings.TrimSpace(channel))
 			if channel != "stable" && channel != "beta" {
@@ -93,9 +93,9 @@ func newUpdateCmd() *cobra.Command {
 func newUninstallCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "uninstall",
-		Short: "卸载 opidcs 命令行（含本地配置）",
+		Short: "卸载 quickidc 命令行（含本地配置）",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if !confirm("确认卸载 opidcs 命令行并删除本地配置？") {
+			if !confirm("确认卸载 quickidc 命令行并删除本地配置？") {
 				return nil
 			}
 			if path, err := config.Path(); err == nil {
@@ -123,7 +123,7 @@ func fetchRelease(channel string) (*releaseInfo, error) {
 	}
 	client := &http.Client{Timeout: 20 * time.Second}
 	req, _ := http.NewRequest(http.MethodGet, endpoint, nil)
-	req.Header.Set("User-Agent", "opidcs/"+version.Version)
+	req.Header.Set("User-Agent", "quickidc/"+version.Version)
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("查询版本失败: %w", err)
@@ -144,7 +144,7 @@ func assetName() string {
 	if runtime.GOOS == "windows" {
 		suffix = ".exe"
 	}
-	return fmt.Sprintf("opidcs-%s-%s%s", runtime.GOOS, runtime.GOARCH, suffix)
+	return fmt.Sprintf("quickidc-%s-%s%s", runtime.GOOS, runtime.GOARCH, suffix)
 }
 
 func downloadAndReplace(url string) error {

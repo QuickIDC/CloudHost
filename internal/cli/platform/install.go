@@ -14,7 +14,7 @@ import (
 func Install(name string) error {
 	name = normalize(name)
 	if name == "" {
-		return errors.New("请指定平台，例如：opidcs plat install docker")
+		return errors.New("请指定平台，例如：quickidc plat install docker")
 	}
 	steps, err := installSteps(name)
 	if err != nil {
@@ -26,7 +26,7 @@ func Install(name string) error {
 			return err
 		}
 	}
-	fmt.Printf("==> %s 安装完成，可用 opidcs plat show %s 查看凭据\n", name, name)
+	fmt.Printf("==> %s 安装完成，可用 quickidc plat show %s 查看凭据\n", name, name)
 	return nil
 }
 

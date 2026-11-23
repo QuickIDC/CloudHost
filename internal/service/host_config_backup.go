@@ -16,7 +16,7 @@ import (
 	"github.com/OpenIDCSTeam/HostAgent-Go/internal/model"
 )
 
-const HostConfigBackupFormat = "openidcs-host-config"
+const HostConfigBackupFormat = "quickidc-host-config"
 const HostConfigBackupVersion = 1
 const MaxHostConfigBackupSize = 10 * 1024 * 1024
 const maxBackupHosts = 1000

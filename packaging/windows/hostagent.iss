@@ -1,15 +1,15 @@
 ; ============================================================================
-; OpenIDCS HostAgent (Go) Windows 安装脚本（Inno Setup 6）
+; QuickIDC HostAgent (Go) Windows 安装脚本（Inno Setup 6）
 ;
 ; 本地构建:
 ;   1) go build -trimpath -ldflags "-s -w" -o dist\hostagent.exe .\cmd\server
 ;   2) 下载 NSSM 2.24，把 win64\nssm.exe 放到本文件同目录
 ;   3) "%ProgramFiles(x86)%\Inno Setup 6\ISCC.exe" /DAppVersion=1.0.0 hostagent.iss
 ;
-; 产物: BuildCache\windows\OpenIDCS-HostAgent-<版本>-win-x64-setup.exe
+; 产物: BuildCache\windows\QuickIDC-HostAgent-<版本>-win-x64-setup.exe
 ;
-; 安装时以 LocalSystem 注册为 Windows 服务 OpenIDCS-HostAgent，
-; 数据目录固定为 C:\ProgramData\OpenIDCS\HostAgent\data（升级不丢失），
+; 安装时以 LocalSystem 注册为 Windows 服务 QuickIDC-HostAgent，
+; 数据目录固定为 C:\ProgramData\QuickIDC\HostAgent\data（升级不丢失），
 ; 内部布局：bins/ logs/ temp/ data.db data.yaml。
 ; ============================================================================
 
@@ -20,11 +20,11 @@
 #define HttpPort "1881"
 #endif
 
-#define AppName "OpenIDCS HostAgent"
+#define AppName "QuickIDC HostAgent"
 #define AppPublisher "OpenIDCSTeam"
 #define AppURL "https://github.com/OpenIDCSTeam/CloudHost"
-#define ServiceName "OpenIDCS-HostAgent"
-#define ServiceDisplayName "OpenIDCS HostAgent"
+#define ServiceName "QuickIDC-HostAgent"
+#define ServiceDisplayName "QuickIDC HostAgent"
 
 [Setup]
 AppId={{8E1F3B62-7C4A-4E21-9F6D-2B5A7C9D4E10}
@@ -35,10 +35,10 @@ AppPublisher={#AppPublisher}
 AppPublisherURL={#AppURL}
 AppSupportURL={#AppURL}
 AppUpdatesURL={#AppURL}
-DefaultDirName={autopf}\OpenIDCS\HostAgent
+DefaultDirName={autopf}\QuickIDC\HostAgent
 DisableProgramGroupPage=yes
 OutputDir=..\..\BuildCache\windows
-OutputBaseFilename=OpenIDCS-HostAgent-{#AppVersion}-win-x64-setup
+OutputBaseFilename=QuickIDC-HostAgent-{#AppVersion}-win-x64-setup
 Compression=lzma2/max
 SolidCompression=yes
 WizardStyle=modern
@@ -63,10 +63,10 @@ Source: "..\..\VNCConsole\*"; DestDir: "{app}\VNCConsole"; Flags: ignoreversion 
 Source: "nssm.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 [Dirs]
-Name: "{commonappdata}\OpenIDCS\HostAgent\data"
-Name: "{commonappdata}\OpenIDCS\HostAgent\data\bins"
-Name: "{commonappdata}\OpenIDCS\HostAgent\data\logs"
-Name: "{commonappdata}\OpenIDCS\HostAgent\data\temp"
+Name: "{commonappdata}\QuickIDC\HostAgent\data"
+Name: "{commonappdata}\QuickIDC\HostAgent\data\bins"
+Name: "{commonappdata}\QuickIDC\HostAgent\data\logs"
+Name: "{commonappdata}\QuickIDC\HostAgent\data\temp"
 
 [Icons]
 Name: "{group}\{#AppName} 管理界面"; Filename: "http://127.0.0.1:{#HttpPort}"
@@ -81,7 +81,7 @@ var
 
 function DataDir: string;
 begin
-  Result := ExpandConstant('{commonappdata}\OpenIDCS\HostAgent\data');
+  Result := ExpandConstant('{commonappdata}\QuickIDC\HostAgent\data');
 end;
 
 function RunNssm(const Params: string): Boolean;
@@ -116,7 +116,7 @@ begin
     RunNssm('set ' + ServiceName + ' AppDirectory "' + ExpandConstant('{app}') + '"');
     RunNssm('set ' + ServiceName + ' AppParameters --data-dir "' + DataDir + '"');
     RunNssm('set ' + ServiceName + ' DisplayName "' + '{#ServiceDisplayName}' + '"');
-    RunNssm('set ' + ServiceName + ' Description "OpenIDCS HostAgent - virtualization management backend"');
+    RunNssm('set ' + ServiceName + ' Description "QuickIDC HostAgent - virtualization management backend"');
     RunNssm('set ' + ServiceName + ' Start SERVICE_AUTO_START');
     RunNssm('set ' + ServiceName + ' AppExit Default Restart');
     RunNssm('set ' + ServiceName + ' AppRestartDelay 5000');
@@ -126,7 +126,7 @@ begin
     RunNssm('start ' + ServiceName);
 
     if WizardIsTaskSelected('firewall') then
-      Exec('netsh', 'advfirewall firewall add rule name="OpenIDCS HostAgent" dir=in action=allow protocol=TCP localport={#HttpPort},6080,7681',
+      Exec('netsh', 'advfirewall firewall add rule name="QuickIDC HostAgent" dir=in action=allow protocol=TCP localport={#HttpPort},6080,7681',
         '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
   end;
 end;
@@ -143,7 +143,7 @@ begin
       RunNssm('stop ' + ServiceName);
       RunNssm('remove ' + ServiceName + ' confirm');
     end;
-    Exec('netsh', 'advfirewall firewall delete rule name="OpenIDCS HostAgent"',
+    Exec('netsh', 'advfirewall firewall delete rule name="QuickIDC HostAgent"',
       '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
 
     // 移除 Hyper-V 带宽限速驱动（内核服务 + 驱动文件）。

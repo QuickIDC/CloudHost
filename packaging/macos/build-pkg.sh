@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-# OpenIDCS HostAgent (Go) macOS .pkg 构建脚本
+# QuickIDC HostAgent (Go) macOS .pkg 构建脚本
 #
 # 前置: 需先构建 Darwin 二进制（CI 或本地）:
 #   GOOS=darwin GOARCH=arm64 CGO_ENABLED=1 \
@@ -10,8 +10,8 @@
 #   ./build-pkg.sh [版本号] [arm64|amd64]
 #   ./build-pkg.sh 1.0.0 arm64
 #
-# 产物: BuildCache/OpenIDCS-HostAgent-<版本>-macos-<架构>.pkg
-# 安装路径: /usr/local/openidcs，launchd 服务 com.openidcst.hostagent
+# 产物: BuildCache/QuickIDC-HostAgent-<版本>-macos-<架构>.pkg
+# 安装路径: /usr/local/quickidc，launchd 服务 com.quickidc.hostagent
 # ============================================================================
 set -euo pipefail
 
@@ -45,12 +45,12 @@ command -v pkgbuild >/dev/null 2>&1 || { echo "pkgbuild 不可用（需要 macOS
 
 echo "[1/4] 准备安装根目录 ..."
 rm -rf "${WORK}"
-mkdir -p "${STAGE}/usr/local/openidcs" "${STAGE}/Library/LaunchDaemons"
+mkdir -p "${STAGE}/usr/local/quickidc" "${STAGE}/Library/LaunchDaemons"
 
-install -m 0755 "${BINARY}" "${STAGE}/usr/local/openidcs/hostagent"
-cp -R "${ROOT}/static" "${STAGE}/usr/local/openidcs/static"
-install -m 0644 "${HERE}/launchd/com.openidcst.hostagent.plist" \
-    "${STAGE}/Library/LaunchDaemons/com.openidcst.hostagent.plist"
+install -m 0755 "${BINARY}" "${STAGE}/usr/local/quickidc/hostagent"
+cp -R "${ROOT}/static" "${STAGE}/usr/local/quickidc/static"
+install -m 0644 "${HERE}/launchd/com.quickidc.hostagent.plist" \
+    "${STAGE}/Library/LaunchDaemons/com.quickidc.hostagent.plist"
 
 chmod +x "${SCRIPTS}/preinstall" "${SCRIPTS}/postinstall"
 
@@ -58,13 +58,13 @@ echo "[2/4] pkgbuild ..."
 pkgbuild \
     --root "${STAGE}" \
     --scripts "${SCRIPTS}" \
-    --identifier "com.openidcst.hostagent" \
+    --identifier "com.quickidc.hostagent" \
     --version "${VERSION}" \
     --install-location "/" \
     "${WORK}/component.pkg"
 
 echo "[3/4] productbuild ..."
-OUT="${ROOT}/BuildCache/OpenIDCS-HostAgent-${VERSION}-macos-${PKG_ARCH}.pkg"
+OUT="${ROOT}/BuildCache/QuickIDC-HostAgent-${VERSION}-macos-${PKG_ARCH}.pkg"
 mkdir -p "$(dirname "${OUT}")"
 productbuild --package "${WORK}/component.pkg" "${OUT}"
 

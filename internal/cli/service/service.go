@@ -15,9 +15,9 @@ import (
 )
 
 const (
-	linuxUnit   = "openidcs"
-	launchdName = "com.openidcst.hostagent"
-	windowsName = "OpenIDCS-HostAgent"
+	linuxUnit   = "quickidc"
+	launchdName = "com.quickidc.hostagent"
+	windowsName = "QuickIDC-HostAgent"
 )
 
 // Options 安装参数。
@@ -106,7 +106,7 @@ func Update(port string) error {
 // Uninstall 卸载主控。
 func Uninstall(purge bool) error {
 	if runtime.GOOS == "windows" {
-		return errors.New("Windows 请通过「应用和功能」卸载 OpenIDCS-HostAgent")
+		return errors.New("Windows 请通过「应用和功能」卸载 QuickIDC-HostAgent")
 	}
 	script, cleanup, err := installScript()
 	if err != nil {
@@ -210,7 +210,7 @@ func installWindows(opt Options) error {
 		return err
 	}
 	dir := filepath.Dir(exe)
-	matches, _ := filepath.Glob(filepath.Join(dir, "OpenIDCS-HostAgent-*-setup.exe"))
+	matches, _ := filepath.Glob(filepath.Join(dir, "QuickIDC-HostAgent-*-setup.exe"))
 	if len(matches) == 0 {
 		return errors.New("未找到安装包：请从 https://github.com/OpenIDCSTeam/CloudHost/releases 下载 setup.exe 后运行")
 	}
@@ -242,7 +242,7 @@ func installScript() (string, func(), error) {
 	if resp.StatusCode != http.StatusOK {
 		return "", func() {}, fmt.Errorf("下载安装脚本失败: HTTP %d", resp.StatusCode)
 	}
-	tmp, err := os.CreateTemp("", "opidcs-install-*.sh")
+	tmp, err := os.CreateTemp("", "quickidc-install-*.sh")
 	if err != nil {
 		return "", func() {}, err
 	}

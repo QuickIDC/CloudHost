@@ -99,12 +99,12 @@ OpenIDC-Client是一个开源的IDC（Internet Data Center）虚拟化统一管�
 curl -fsSL https://raw.githubusercontent.com/OpenIDCSTeam/IDCClient/main/install.sh | sudo bash
 ```
 
-脚本会按 CPU 架构下载对应的 Release 二进制，安装程序到 `/opt/openidcs`、数据到
-`/var/lib/openidcs`，并注册 systemd 服务 `openidcs`（默认端口 `1881`，开机自启）：
+脚本会按 CPU 架构下载对应的 Release 二进制，安装程序到 `/opt/quickidc`、数据到
+`/var/lib/quickidc`，并注册 systemd 服务 `quickidc`（默认端口 `1881`，开机自启）：
 
 ```bash
-sudo systemctl status openidcs     # 查看状态
-sudo journalctl -u openidcs -f     # 查看实时日志
+sudo systemctl status quickidc     # 查看状态
+sudo journalctl -u quickidc -f     # 查看实时日志
 sudo bash install.sh --uninstall   # 卸载（保留数据）
 ```
 
@@ -114,8 +114,8 @@ sudo bash install.sh --uninstall   # 卸载（保留数据）
 |------|------|
 | `--version v1.0.0` | 指定 Release 版本，默认 `latest`（也支持 `alpha` / `beta`） |
 | `--port 1881` | HTTP 端口 |
-| `--dir /opt/openidcs` | 程序安装目录 |
-| `--data-dir /var/lib/openidcs` | 数据目录 |
+| `--dir /opt/quickidc` | 程序安装目录 |
+| `--data-dir /var/lib/quickidc` | 数据目录 |
 | `--file ./hostagent-linux-amd64.tar.gz` | 离线包安装 |
 | `--firewall` | 自动放行 1881 / 6080 / 7681 |
 | `--uninstall [--purge]` | 卸载，`--purge` 同时删除数据 |
@@ -123,15 +123,15 @@ sudo bash install.sh --uninstall   # 卸载（保留数据）
 ### Windows 安装（Inno Setup）
 
 1. 从 [Releases](https://github.com/OpenIDCSTeam/CloudHost/releases) 下载
-   `OpenIDCS-HostAgent-<版本>-win-x64-setup.exe`。
-2. 双击安装，安装器会通过 NSSM 注册系统服务 `OpenIDCS-HostAgent`（LocalSystem，
+   `QuickIDC-HostAgent-<版本>-win-x64-setup.exe`。
+2. 双击安装，安装器会通过 NSSM 注册系统服务 `QuickIDC-HostAgent`（LocalSystem，
    开机自启，异常自动重启），并可选放行 1881 / 6080 / 7681 端口。
 
 | 项目 | 路径 |
 |------|------|
-| 程序目录 | `C:\Program Files\OpenIDCS\HostAgent` |
-| 数据目录 | `C:\ProgramData\OpenIDCS\HostAgent\data`（升级不丢失，内含 `data.db` 与 `data.yaml`） |
-| 服务名 | `OpenIDCS-HostAgent` |
+| 程序目录 | `C:\Program Files\QuickIDC\HostAgent` |
+| 数据目录 | `C:\ProgramData\QuickIDC\HostAgent\data`（升级不丢失，内含 `data.db` 与 `data.yaml`） |
+| 服务名 | `QuickIDC-HostAgent` |
 
 也可以下载 `hostagent-windows-amd64.zip` 免安装运行。
 
@@ -144,11 +144,11 @@ GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 \
 chmod +x packaging/macos/build-pkg.sh
 ./packaging/macos/build-pkg.sh 1.0.0 arm64
 
-sudo installer -pkg BuildCache/OpenIDCS-HostAgent-1.0.0-macos-arm64.pkg -target /
+sudo installer -pkg BuildCache/QuickIDC-HostAgent-1.0.0-macos-arm64.pkg -target /
 ```
 
-安装到 `/usr/local/openidcs`，由 launchd 服务 `com.openidcst.hostagent` 托管，
-数据目录 `/usr/local/var/lib/openidcs`。CI 中的 macOS 任务默认注释，需要时在
+安装到 `/usr/local/quickidc`，由 launchd 服务 `com.quickidc.hostagent` 托管，
+数据目录 `/usr/local/var/lib/quickidc`。CI 中的 macOS 任务默认注释，需要时在
 `.github/workflows/release.yml` 取消 `build-macos` 注释。
 
 ### 访问后端
@@ -359,7 +359,7 @@ OpenIDC-Client/
 │   ├── build_nuitkaui.*        # Nuitka打包
 │   └── build_cxfreeze.*        # cx_Freeze打包
 ├── 📁 bin/                     # CLI管理工具
-│   └── openidcs                # Linux 服务管理脚本（启动/停止/更新/卸载等）
+│   └── quickidc                # Linux 服务管理脚本（启动/停止/更新/卸载等）
 ├── 📄 install.sh               # Linux 一键安装脚本
 └── 📄 MainServer.py            # 主程序入口
 ```
@@ -392,16 +392,16 @@ database:
   mysql:
     host: 127.0.0.1
     port: 3306
-    user: openidcs
+    user: quickidc
     password: ""
-    database: openidcs
+    database: quickidc
     params: charset=utf8mb4&parseTime=true&loc=Local
   postgres:
     host: 127.0.0.1
     port: 5432
-    user: openidcs
+    user: quickidc
     password: ""
-    database: openidcs
+    database: quickidc
     sslmode: disable
 log:
   console: info
@@ -411,16 +411,16 @@ log:
 
 - 端口优先级：命令行 `--port` > `data.yaml` > 默认 1881。
 - SQLite 之外的数据库需先建库，并给账号授予建表/索引权限；首次启动自动建表。
-- 切换数据库不会自动搬迁旧数据，请用 `opidcs host export` / SQL 工具迁移。
-- 环境变量 `OPIDCS_PORT`、`OPIDCS_DB_DRIVER`、`OPIDCS_DB_DSN`、`OPIDCS_DATA_DIR` 可覆盖配置。
+- 切换数据库不会自动搬迁旧数据，请用 `quickidc host export` / SQL 工具迁移。
+- 环境变量 `QUICKIDC_PORT`、`QUICKIDC_DB_DRIVER`、`QUICKIDC_DB_DSN`、`QUICKIDC_DATA_DIR` 可覆盖配置。
 - 旧版 `DataSaving/` 会在首次启动时自动迁移到 `data/`（数据库、日志、Caddyfile、备份、密钥），原目录保留。
 
 可选环境变量：
 
 | 变量 | 默认值 | 说明 |
 |------|--------|------|
-| `OPENIDCS_COOKIE_SECURE` | 关闭 | 设为 `1` 时会话 Cookie 只通过 HTTPS 回传。HTTPS 部署应开启，纯 HTTP 部署必须关闭，否则浏览器不回传 Cookie、登录失效 |
-| `OPENIDCS_TASK_TIMEOUT_MINUTES` | `30` | 异步任务（创建/删除/更新/重装虚拟机）的执行超时，单位分钟；备份/还原类固定 24 小时 |
+| `QUICKIDC_COOKIE_SECURE` | 关闭 | 设为 `1` 时会话 Cookie 只通过 HTTPS 回传。HTTPS 部署应开启，纯 HTTP 部署必须关闭，否则浏览器不回传 Cookie、登录失效 |
+| `QUICKIDC_TASK_TIMEOUT_MINUTES` | `30` | 异步任务（创建/删除/更新/重装虚拟机）的执行超时，单位分钟；备份/还原类固定 24 小时 |
 
 所有为开源社区做出贡献的开发者们
 
@@ -437,7 +437,7 @@ log:
 - **项目主页**: https://github.com/OpenIDCSTeam/HostAgent
 - **问题反馈**: https://github.com/OpenIDCSTeam/HostAgent/issues
 - **讨论交流**: https://gitter.im/OpenIDCSTeam/community
-- **邮箱联系**: openidcs@team.org
+- **邮箱联系**: quickidc@team.org
 
 ---
 

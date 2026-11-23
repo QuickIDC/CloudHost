@@ -238,7 +238,7 @@ func (d *WorkstationDriver) resizeVirtualHardDisk(path string, sizeMB int) error
 
 	// 回退 diskpart（系统自带，不依赖 Hyper-V 模块）
 	script := fmt.Sprintf("select vdisk file=\"%s\"\r\nexpand vdisk maximum=%d\r\nexit\r\n", path, sizeMB)
-	tmp := filepath.Join(os.TempDir(), fmt.Sprintf("opidcs-vhd-%d.txt", time.Now().UnixNano()))
+	tmp := filepath.Join(os.TempDir(), fmt.Sprintf("quickidc-vhd-%d.txt", time.Now().UnixNano()))
 	if writeErr := os.WriteFile(tmp, []byte(script), 0o600); writeErr != nil {
 		return fmt.Errorf("Resize-VHD 失败（%s），写 diskpart 脚本也失败: %v",
 			strings.TrimSpace(psOut), writeErr)

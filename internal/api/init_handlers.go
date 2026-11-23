@@ -14,7 +14,7 @@ import (
 
 const (
 	// defaultSystemTitle 未设置系统标题时的默认值
-	defaultSystemTitle = "OpenIDCS 虚拟化管理平台"
+	defaultSystemTitle = "QuickIDC 虚拟化管理平台"
 	// systemTitleSettingKey 系统标题在 system_settings 中的键名
 	systemTitleSettingKey = "system_title"
 	// adminUsername 初始化时创建的管理员账号

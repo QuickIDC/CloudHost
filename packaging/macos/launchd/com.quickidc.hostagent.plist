@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.quickidc.hostagent</string>
+
+	<key>ProgramArguments</key>
+	<array>
+		<string>/usr/local/quickidc/hostagent</string>
+		<string>--port</string>
+		<string>1881</string>
+		<string>--data-dir</string>
+		<string>/usr/local/var/lib/quickidc</string>
+	</array>
+
+	<key>WorkingDirectory</key>
+	<string>/usr/local/quickidc</string>
+
+	<key>RunAtLoad</key>
+	<true/>
+
+	<key>KeepAlive</key>
+	<dict>
+		<key>SuccessfulExit</key>
+		<false/>
+	</dict>
+
+	<key>ThrottleInterval</key>
+	<integer>10</integer>
+
+	<key>StandardOutPath</key>
+	<string>/usr/local/var/log/quickidc/stdout.log</string>
+	<key>StandardErrorPath</key>
+	<string>/usr/local/var/log/quickidc/stderr.log</string>
+
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>LANG</key>
+		<string>en_US.UTF-8</string>
+	</dict>
+</dict>
+</plist>

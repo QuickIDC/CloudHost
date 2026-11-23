@@ -61,12 +61,12 @@ func (e *EmailService) sendEmail(to, subject, html string) error {
 
 // SendVerificationEmail 发送邮箱验证邮件
 func (e *EmailService) SendVerificationEmail(toEmail, username, verifyURL string) error {
-	html := fmt.Sprintf(`<h2>欢迎注册 OpenIDCS</h2>
+	html := fmt.Sprintf(`<h2>欢迎注册 QuickIDC</h2>
 <p>您好 %s，</p>
 <p>请点击下面的链接验证您的邮箱：</p>
 <p><a href="%s">%s</a></p>
 <p>如果您没有注册账号，请忽略此邮件。此链接24小时内有效。</p>`, username, verifyURL, verifyURL)
-	return e.sendEmail(toEmail, "OpenIDCS - 邮箱验证", html)
+	return e.sendEmail(toEmail, "QuickIDC - 邮箱验证", html)
 }
 
 // SendPasswordResetEmail 发送密码重置邮件
@@ -76,7 +76,7 @@ func (e *EmailService) SendPasswordResetEmail(toEmail, username, resetLink strin
 <p>请点击下面的链接重置您的密码：</p>
 <p><a href="%s">%s</a></p>
 <p>如果您没有请求重置密码，请忽略此邮件。此链接24小时内有效。</p>`, username, resetLink, resetLink)
-	return e.sendEmail(toEmail, "OpenIDCS - 密码重置", html)
+	return e.sendEmail(toEmail, "QuickIDC - 密码重置", html)
 }
 
 // SendEmailChangeVerification 发送邮箱变更验证邮件
@@ -86,18 +86,18 @@ func (e *EmailService) SendEmailChangeVerification(toEmail, username, verifyURL 
 <p>请点击下面的链接验证您的新邮箱地址：</p>
 <p><a href="%s">%s</a></p>
 <p>如果您没有请求变更邮箱，请忽略此邮件。此链接24小时内有效。</p>`, username, verifyURL, verifyURL)
-	return e.sendEmail(toEmail, "OpenIDCS - 邮箱变更验证", html)
+	return e.sendEmail(toEmail, "QuickIDC - 邮箱变更验证", html)
 }
 
 // SendTestEmail 发送测试邮件
 func (e *EmailService) SendTestEmail(toEmail, subject, body string) error {
 	if subject == "" {
-		subject = "OpenIDCS - 测试邮件"
+		subject = "QuickIDC - 测试邮件"
 	}
 	html := body
 	if html == "" {
 		html = fmt.Sprintf(`<h2>测试邮件</h2>
-<p>这是一封来自 OpenIDCS 系统的测试邮件。</p>
+<p>这是一封来自 QuickIDC 系统的测试邮件。</p>
 <p>测试时间: %s</p>`, time.Now().Format("2006-01-02 15:04:05"))
 	}
 	return e.sendEmail(toEmail, subject, html)

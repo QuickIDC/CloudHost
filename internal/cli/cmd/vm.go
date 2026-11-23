@@ -178,7 +178,7 @@ func newVMCmd() *cobra.Command {
 		Short: "电源操作：start|stop|restart|on|off|reset|pause|resume",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) < 2 {
-				return fmt.Errorf("用法：opidcs vm power <action> <uuid>")
+				return fmt.Errorf("用法：quickidc vm power <action> <uuid>")
 			}
 			action := normalizeAction(args[0])
 			if action == "" {

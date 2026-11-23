@@ -92,7 +92,7 @@ func (e *Executor) worker(id int) {
 // 任务超时配置：
 //   - 默认 30 分钟，覆盖装系统、删盘等分钟级操作；
 //   - 备份/还原类放宽到 24 小时（大磁盘 vzdump 可能跑数小时）；
-//   - 运维可通过 OPENIDCS_TASK_TIMEOUT_MINUTES 统一调整默认值。
+//   - 运维可通过 QUICKIDC_TASK_TIMEOUT_MINUTES 统一调整默认值。
 const (
 	defaultTaskTimeoutMinutes = 30
 	backupTaskTimeout         = 24 * time.Hour
@@ -104,7 +104,7 @@ func timeoutForTask(taskType string) time.Duration {
 	case "backup", "restore", "backup_restore", "vm_backup", "vm_restore":
 		return backupTaskTimeout
 	}
-	if v := strings.TrimSpace(os.Getenv("OPENIDCS_TASK_TIMEOUT_MINUTES")); v != "" {
+	if v := strings.TrimSpace(os.Getenv("QUICKIDC_TASK_TIMEOUT_MINUTES")); v != "" {
 		if n, err := strconv.Atoi(v); err == nil && n > 0 {
 			return time.Duration(n) * time.Minute
 		}

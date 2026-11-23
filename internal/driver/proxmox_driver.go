@@ -32,9 +32,9 @@ import (
 //
 // 默认保持与 Python 版一致的「不校验」，因为 PVE / ESXi 普遍使用
 // 自签名证书，强制校验会导致既有部署无法连接。
-// 可通过环境变量 OPENIDCS_TLS_VERIFY=1 启用校验以获得完整的主机身份保证。
+// 可通过环境变量 QUICKIDC_TLS_VERIFY=1 启用校验以获得完整的主机身份保证。
 func TLSVerifyEnabled() bool {
-	v := strings.ToLower(strings.TrimSpace(os.Getenv("OPENIDCS_TLS_VERIFY")))
+	v := strings.ToLower(strings.TrimSpace(os.Getenv("QUICKIDC_TLS_VERIFY")))
 	return v == "1" || v == "true" || v == "yes"
 }
 
@@ -1293,7 +1293,7 @@ func (d *ProxmoxDriver) GetScreenshot(vmUUID string) (string, error) {
 func (d *ProxmoxDriver) captureProxmoxScreen(sshCfg SSHExecConfig, vmid int64) (string, error) {
 	// 优先写 tmpfs（/dev/shm）：screendump 在普通磁盘上可能留下未完成的
 	// 部分文件，而 tmpfs 写入更快、无回写延迟。
-	remote := fmt.Sprintf("/dev/shm/openidcs-screen-%d-%d.ppm", vmid, time.Now().UnixNano())
+	remote := fmt.Sprintf("/dev/shm/quickidc-screen-%d-%d.ppm", vmid, time.Now().UnixNano())
 
 	// 必须等文件大小稳定，而不是「非空」：screendump 一开始就会创建文件，
 	// 此时内容只有头部，读到的是残缺 PPM。

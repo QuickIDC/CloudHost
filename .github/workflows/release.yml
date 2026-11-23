@@ -5,7 +5,7 @@ name: Release
 #   - push main          -> beta 通道（滚动预发布，tag=beta）
 #   - workflow_dispatch  -> 可选 channel=auto|beta|release 与版本号
 #
-# 一次流水线同时产出：主控 HostAgent、opidcs CLI、opidcs 桌面客户端（Inno/AppImage/app+dmg）。
+# 一次流水线同时产出：主控 HostAgent、quickidc CLI、quickidc 桌面客户端（Inno/AppImage/app+dmg）。
 
 on:
   push:
@@ -194,9 +194,9 @@ jobs:
           if-no-files-found: error
 
   # ==========================================================================
-  # opidcs CLI：Linux / macOS / Windows
+  # quickidc CLI：Linux / macOS / Windows
   # ==========================================================================
-  build-opidcs:
+  build-quickidc:
     needs: prepare
     runs-on: ${{ matrix.runner }}
     strategy:
@@ -223,7 +223,7 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
-      - name: Build opidcs
+      - name: Build quickidc
         shell: bash
         env:
           GOOS: ${{ matrix.goos }}
@@ -235,11 +235,11 @@ jobs:
           suffix=""
           if [[ "${GOOS}" == "windows" ]]; then suffix=".exe"; fi
           go build -trimpath -ldflags "-s -w -X github.com/OpenIDCSTeam/HostAgent-Go/internal/cli/version.Version=${{ needs.prepare.outputs.version }}" \
-            -o "dist/opidcs-${GOOS}-${GOARCH}${suffix}" ./cmd/opidcs
+            -o "dist/quickidc-${GOOS}-${GOARCH}${suffix}" ./cmd/quickidc
       - uses: actions/upload-artifact@v4
         with:
-          name: opidcs-${{ matrix.goos }}-${{ matrix.goarch }}
-          path: dist/opidcs-*
+          name: quickidc-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: dist/quickidc-*
 
   # ==========================================================================
   # GUI：Windows（Tauri 构建 + Inno Setup 自打包）
@@ -258,20 +258,20 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: tools/opidcs-gui/package-lock.json
+          cache-dependency-path: tools/quickidc-gui/package-lock.json
       - uses: dtolnay/rust-toolchain@stable
       - name: Install Inno Setup
         shell: pwsh
         run: choco install innosetup -y --no-progress
       - name: Install frontend dependencies
-        working-directory: tools/opidcs-gui
+        working-directory: tools/quickidc-gui
         run: npm ci
       - name: Generate icons
-        working-directory: tools/opidcs-gui
+        working-directory: tools/quickidc-gui
         run: npm run icon
       - name: Set app version
         shell: bash
-        working-directory: tools/opidcs-gui
+        working-directory: tools/quickidc-gui
         env:
           APP_VERSION: ${{ needs.prepare.outputs.version }}
         run: |
@@ -280,23 +280,23 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p tools/opidcs-gui/src-tauri/binaries
+          mkdir -p tools/quickidc-gui/src-tauri/binaries
           CGO_ENABLED=0 GOOS=windows GOARCH=amd64 \
             go build -trimpath -ldflags "-s -w -X github.com/OpenIDCSTeam/HostAgent-Go/internal/cli/version.Version=${{ needs.prepare.outputs.version }}" \
-            -o "tools/opidcs-gui/src-tauri/binaries/opidcs-x86_64-pc-windows-msvc.exe" ./cmd/opidcs
+            -o "tools/quickidc-gui/src-tauri/binaries/quickidc-x86_64-pc-windows-msvc.exe" ./cmd/quickidc
       - name: Build desktop client
-        working-directory: tools/opidcs-gui
+        working-directory: tools/quickidc-gui
         run: npm run tauri build -- --no-bundle
       - name: Build Inno Setup installer
         shell: pwsh
         run: |
           $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
-          & $iscc "/DAppVersion=${{ needs.prepare.outputs.version }}" "packaging\windows\opidcs.iss"
+          & $iscc "/DAppVersion=${{ needs.prepare.outputs.version }}" "packaging\windows\quickidc.iss"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@v4
         with:
           name: gui-windows-inno
-          path: BuildCache/windows/opidcs-*-win-x64-setup.exe
+          path: BuildCache/windows/quickidc-*-win-x64-setup.exe
           if-no-files-found: error
 
   # ==========================================================================
@@ -316,37 +316,37 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: tools/opidcs-gui/package-lock.json
+          cache-dependency-path: tools/quickidc-gui/package-lock.json
       - uses: dtolnay/rust-toolchain@stable
       - name: Install Linux dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
       - name: Install frontend dependencies
-        working-directory: tools/opidcs-gui
+        working-directory: tools/quickidc-gui
         run: npm ci
       - name: Generate icons
-        working-directory: tools/opidcs-gui
+        working-directory: tools/quickidc-gui
         run: npm run icon
       - name: Set app version
-        working-directory: tools/opidcs-gui
+        working-directory: tools/quickidc-gui
         env:
           APP_VERSION: ${{ needs.prepare.outputs.version }}
         run: node -e "const fs=require('fs');const p='src-tauri/tauri.conf.json';const j=JSON.parse(fs.readFileSync(p,'utf8'));j.version=process.env.APP_VERSION;fs.writeFileSync(p,JSON.stringify(j,null,2)+'\n')"
       - name: Build sidecar
         run: |
           set -euo pipefail
-          mkdir -p tools/opidcs-gui/src-tauri/binaries
+          mkdir -p tools/quickidc-gui/src-tauri/binaries
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
             go build -trimpath -ldflags "-s -w -X github.com/OpenIDCSTeam/HostAgent-Go/internal/cli/version.Version=${{ needs.prepare.outputs.version }}" \
-            -o "tools/opidcs-gui/src-tauri/binaries/opidcs-x86_64-unknown-linux-gnu" ./cmd/opidcs
+            -o "tools/quickidc-gui/src-tauri/binaries/quickidc-x86_64-unknown-linux-gnu" ./cmd/quickidc
       - name: Build AppImage
-        working-directory: tools/opidcs-gui
+        working-directory: tools/quickidc-gui
         run: npm run tauri build -- --bundles appimage
       - uses: actions/upload-artifact@v4
         with:
           name: gui-linux-appimage
-          path: tools/opidcs-gui/src-tauri/target/release/bundle/appimage/*.AppImage
+          path: tools/quickidc-gui/src-tauri/target/release/bundle/appimage/*.AppImage
           if-no-files-found: error
 
   # ==========================================================================
@@ -378,30 +378,30 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: tools/opidcs-gui/package-lock.json
+          cache-dependency-path: tools/quickidc-gui/package-lock.json
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.triple }}
       - name: Install frontend dependencies
-        working-directory: tools/opidcs-gui
+        working-directory: tools/quickidc-gui
         run: npm ci
       - name: Generate icons
-        working-directory: tools/opidcs-gui
+        working-directory: tools/quickidc-gui
         run: npm run icon
       - name: Set app version
-        working-directory: tools/opidcs-gui
+        working-directory: tools/quickidc-gui
         env:
           APP_VERSION: ${{ needs.prepare.outputs.version }}
         run: node -e "const fs=require('fs');const p='src-tauri/tauri.conf.json';const j=JSON.parse(fs.readFileSync(p,'utf8'));j.version=process.env.APP_VERSION;fs.writeFileSync(p,JSON.stringify(j,null,2)+'\n')"
       - name: Build sidecar
         run: |
           set -euo pipefail
-          mkdir -p tools/opidcs-gui/src-tauri/binaries
+          mkdir -p tools/quickidc-gui/src-tauri/binaries
           CGO_ENABLED=0 GOOS=darwin GOARCH=${{ matrix.goarch }} \
             go build -trimpath -ldflags "-s -w -X github.com/OpenIDCSTeam/HostAgent-Go/internal/cli/version.Version=${{ needs.prepare.outputs.version }}" \
-            -o "tools/opidcs-gui/src-tauri/binaries/opidcs-${{ matrix.triple }}" ./cmd/opidcs
+            -o "tools/quickidc-gui/src-tauri/binaries/quickidc-${{ matrix.triple }}" ./cmd/quickidc
       - name: Build app and dmg
-        working-directory: tools/opidcs-gui
+        working-directory: tools/quickidc-gui
         run: npm run tauri build -- --target ${{ matrix.triple }} --bundles app,dmg
       - name: Collect artifacts
         env:
@@ -409,10 +409,10 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p dist
-          cp tools/opidcs-gui/src-tauri/target/${{ matrix.triple }}/release/bundle/dmg/*.dmg dist/
+          cp tools/quickidc-gui/src-tauri/target/${{ matrix.triple }}/release/bundle/dmg/*.dmg dist/
           ditto -c -k --sequesterRsrc --keepParent \
-            "tools/opidcs-gui/src-tauri/target/${{ matrix.triple }}/release/bundle/macos/opidcs.app" \
-            "dist/opidcs-${APP_VERSION}-macos-${{ matrix.suffix }}.zip"
+            "tools/quickidc-gui/src-tauri/target/${{ matrix.triple }}/release/bundle/macos/quickidc.app" \
+            "dist/quickidc-${APP_VERSION}-macos-${{ matrix.suffix }}.zip"
       - uses: actions/upload-artifact@v4
         with:
           name: gui-macos-${{ matrix.suffix }}
@@ -427,7 +427,7 @@ jobs:
       - prepare
       - build-linux
       - build-windows
-      - build-opidcs
+      - build-quickidc
       - build-gui-windows
       - build-gui-linux
       - build-gui-macos

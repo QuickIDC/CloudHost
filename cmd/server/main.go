@@ -37,7 +37,7 @@ var (
 func main() {
 	rootCmd := &cobra.Command{
 		Use:   "hostagent",
-		Short: "OpenIDCS HostAgent - 虚拟化统一管理平台后端",
+		Short: "QuickIDC HostAgent - 虚拟化统一管理平台后端",
 		RunE:  run,
 	}
 
@@ -152,7 +152,7 @@ func run(cmd *cobra.Command, args []string) error {
 
 	consoleLevel, fileLevel, dbLevel := app.Logger.Levels()
 	fmt.Printf("\n========================================\n")
-	fmt.Printf("  OpenIDCS HostAgent-Go 已启动\n")
+	fmt.Printf("  QuickIDC HostAgent-Go 已启动\n")
 	fmt.Printf("  监听地址: %s\n", fmt.Sprintf("%s:%d", cfg.Server.Host, port))
 	fmt.Printf("  数据目录: %s\n", dataDir)
 	fmt.Printf("  配置文件: %s\n", paths.Config())

@@ -13,7 +13,7 @@ var coreInstallOpt service.Options
 func newCoreCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "core",
-		Short: "管理主控（OpenIDCS CloudHost）",
+		Short: "管理主控（QuickIDC CloudHost）",
 	}
 
 	install := &cobra.Command{
@@ -31,8 +31,8 @@ func newCoreCmd() *cobra.Command {
 	}
 	install.Flags().StringVar(&coreInstallOpt.Version, "version", "", "指定版本，如 v1.0.0")
 	install.Flags().StringVarP(&coreInstallOpt.Port, "port", "p", "", "HTTP 端口（默认 1881）")
-	install.Flags().StringVar(&coreInstallOpt.Dir, "dir", "", "安装目录（默认 /opt/openidcs）")
-	install.Flags().StringVar(&coreInstallOpt.DataDir, "data-dir", "", "数据目录（默认 /var/lib/openidcs）")
+	install.Flags().StringVar(&coreInstallOpt.Dir, "dir", "", "安装目录（默认 /opt/quickidc）")
+	install.Flags().StringVar(&coreInstallOpt.DataDir, "data-dir", "", "数据目录（默认 /var/lib/quickidc）")
 	install.Flags().StringVarP(&coreInstallOpt.File, "file", "f", "", "离线安装包")
 	install.Flags().BoolVar(&coreInstallOpt.Firewall, "firewall", false, "自动放行 1881/6080/7681")
 

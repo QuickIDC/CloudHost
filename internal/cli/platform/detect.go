@@ -200,17 +200,17 @@ func linuxCPUFlags() string {
 func installHint(name string) string {
 	switch normalize(name) {
 	case "docker":
-		return "opidcs plat install docker"
+		return "quickidc plat install docker"
 	case "lxd":
-		return "opidcs plat install lxd"
+		return "quickidc plat install lxd"
 	case "smolvm":
-		return "opidcs plat install smolvm（需 KVM + Firecracker/Cloud-Hypervisor）"
+		return "quickidc plat install smolvm（需 KVM + Firecracker/Cloud-Hypervisor）"
 	case "qemu":
-		return "opidcs plat install qemu"
+		return "quickidc plat install qemu"
 	case "virtualbox":
-		return "opidcs plat install virtualbox"
+		return "quickidc plat install virtualbox"
 	case "hyperv":
-		return "opidcs plat install hyperv（Windows 功能）"
+		return "quickidc plat install hyperv（Windows 功能）"
 	case "vmware":
 		return "安装 VMware Workstation Pro 并启动 vmrest"
 	case "memu":

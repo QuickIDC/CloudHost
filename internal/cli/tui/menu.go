@@ -1,4 +1,4 @@
-// Package tui 提供 opidcs 的交互式菜单。
+// Package tui 提供 quickidc 的交互式菜单。
 package tui
 
 import (
@@ -13,7 +13,7 @@ func Run(run func(args []string) error) error {
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		fmt.Print(`
-OpenIDCS 管理工具
+QuickIDC 管理工具
   1) 主控服务
   2) 虚拟化平台
   3) 主机
@@ -71,7 +71,7 @@ func coreMenu(run func([]string) error, r *bufio.Reader) error {
 		if port := ask(r, "端口（默认 1881）"); port != "" {
 			args = append(args, "--port", port)
 		}
-		if dataDir := ask(r, "数据目录（默认 /var/lib/openidcs）"); dataDir != "" {
+		if dataDir := ask(r, "数据目录（默认 /var/lib/quickidc）"); dataDir != "" {
 			args = append(args, "--data-dir", dataDir)
 		}
 	}

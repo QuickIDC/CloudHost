@@ -1,4 +1,4 @@
-// Package version 保存 opidcs 版本信息。
+// Package version 保存 quickidc 版本信息。
 package version
 
 // Version 由发布流水线通过 -ldflags 注入。

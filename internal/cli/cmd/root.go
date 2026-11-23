@@ -1,4 +1,4 @@
-// Package cmd 实现 opidcs 的命令树。
+// Package cmd 实现 quickidc 的命令树。
 package cmd
 
 import (
@@ -41,9 +41,9 @@ func Execute() int {
 // NewRootCmd 构建根命令（TUI 每次重建，避免 flag 状态残留）。
 func NewRootCmd() *cobra.Command {
 	root := &cobra.Command{
-		Use:   "opidcs",
-		Short: "OpenIDCS 命令行管理工具",
-		Long: `opidcs 是 OpenIDCS 的官方命令行：管理主控、虚拟化平台、主机、实例、端口、反代、用户、任务、日志与系统设置。
+		Use:   "quickidc",
+		Short: "QuickIDC 命令行管理工具",
+		Long: `quickidc 是 QuickIDC 的官方命令行：管理主控、虚拟化平台、主机、实例、端口、反代、用户、任务、日志与系统设置。
 
 不带参数运行会进入交互式菜单。`,
 		SilenceUsage:  true,
@@ -66,7 +66,7 @@ func NewRootCmd() *cobra.Command {
 	pf.StringVar(&flagURL, "url", "", "临时指定主控地址")
 	pf.StringVar(&flagToken, "token", "", "临时指定 Token（- 表示从 stdin 读取）")
 	pf.StringVar(&flagOutput, "output", "table", "输出格式：table|json|yaml")
-	pf.StringVar(&flagDataDir, "data-dir", "", "主控运行目录（默认 OPIDCS_DATA_DIR 或 ./data）")
+	pf.StringVar(&flagDataDir, "data-dir", "", "主控运行目录（默认 QUICKIDC_DATA_DIR 或 ./data）")
 	pf.BoolVar(&flagYes, "yes", false, "跳过确认")
 	pf.BoolVar(&flagShowSecret, "show-secret", false, "明文显示 Token")
 

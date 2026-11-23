@@ -34,9 +34,9 @@ const (
 const knownHostsGlobalKey = "ssh_known_hosts"
 
 // CurrentSSHHostKeyPolicy 从环境变量读取策略，默认 TOFU。
-// OPENIDCS_SSH_HOSTKEY = strict | tofu | insecure
+// QUICKIDC_SSH_HOSTKEY = strict | tofu | insecure
 func CurrentSSHHostKeyPolicy() SSHHostKeyPolicy {
-	switch strings.ToLower(strings.TrimSpace(os.Getenv("OPENIDCS_SSH_HOSTKEY"))) {
+	switch strings.ToLower(strings.TrimSpace(os.Getenv("QUICKIDC_SSH_HOSTKEY"))) {
 	case string(SSHHostKeyStrict):
 		return SSHHostKeyStrict
 	case string(SSHHostKeyInsecure):

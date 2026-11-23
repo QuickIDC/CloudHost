@@ -22,12 +22,12 @@ func SetDataDir(dir string) {
 }
 
 // DataDir 返回主控运行目录（与 CLI 保持一致）。
-// 优先级：--data-dir > OPIDCS_DATA_DIR > 常见安装路径 > ./data。
+// 优先级：--data-dir > QUICKIDC_DATA_DIR > 常见安装路径 > ./data。
 func DataDir() string {
 	if dataDirOverride != "" {
 		return dataDirOverride
 	}
-	if dir := strings.TrimSpace(os.Getenv("OPIDCS_DATA_DIR")); dir != "" {
+	if dir := strings.TrimSpace(os.Getenv("QUICKIDC_DATA_DIR")); dir != "" {
 		return dir
 	}
 	for _, candidate := range installedDataDirs() {
@@ -42,12 +42,12 @@ func installedDataDirs() []string {
 	switch runtime.GOOS {
 	case "windows":
 		if base := os.Getenv("ProgramData"); base != "" {
-			return []string{filepath.Join(base, "OpenIDCS", "HostAgent", "data")}
+			return []string{filepath.Join(base, "QuickIDC", "HostAgent", "data")}
 		}
 	case "darwin":
-		return []string{"/usr/local/openidcs/data"}
+		return []string{"/usr/local/quickidc/data"}
 	default:
-		return []string{"/var/lib/openidcs"}
+		return []string{"/var/lib/quickidc"}
 	}
 	return nil
 }

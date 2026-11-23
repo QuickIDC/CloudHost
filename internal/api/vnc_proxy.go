@@ -587,11 +587,11 @@ func (s *SSHTerminalServer) SetHostKeyStore(store *security.HostKeyStore) {
 // hostKeyCallback 返回 SSH 主机密钥校验回调。
 //
 // 原实现无条件使用 InsecureIgnoreHostKey，无法识别中间人；
-// 现在按 OPENIDCS_SSH_HOSTKEY 策略校验（默认 tofu）。
+// 现在按 QUICKIDC_SSH_HOSTKEY 策略校验（默认 tofu）。
 func (s *SSHTerminalServer) hostKeyCallback() ssh.HostKeyCallback {
 	policy := security.CurrentSSHHostKeyPolicy()
 	if policy == security.SSHHostKeyInsecure {
-		log.Printf("[ssh-terminal] 警告：SSH 主机密钥校验已禁用（OPENIDCS_SSH_HOSTKEY=insecure）")
+		log.Printf("[ssh-terminal] 警告：SSH 主机密钥校验已禁用（QUICKIDC_SSH_HOSTKEY=insecure）")
 		return ssh.InsecureIgnoreHostKey()
 	}
 	if s.hostKeys == nil {

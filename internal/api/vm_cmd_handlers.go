@@ -156,7 +156,7 @@ func (app *App) handleVMCmdStatus(c *gin.Context) {
 // 需要 Bearer Token 认证（用于外部系统集成）
 //
 // 响应同时兼容两套字段命名（历史遗留的外部插件/自动化插件都在使用）：
-//   - Python 版：temp_token / expire（FSPlugins/OpenIDC-IDCSmart、OpenIDC-SwapIDC）
+//   - Python 版：temp_token / expire（FSPlugins/QuickIDC-IDCSmart、QuickIDC-SwapIDC）
 //   - Go 版旧字段：token / expire_in / login_url
 //
 // 虚拟用户名固定为 {hs_name}-{vm_uuid}，与 Python 版一致：

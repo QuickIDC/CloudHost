@@ -265,7 +265,7 @@ func (o *windowsHostOps) AddFirewallRule(rule HostFirewallRule) error {
 	}
 	comment := strings.TrimSpace(rule.Comment)
 	if comment == "" {
-		comment = fmt.Sprintf("openidcs %s/%s", proto, strings.TrimSpace(rule.Port))
+		comment = fmt.Sprintf("quickidc %s/%s", proto, strings.TrimSpace(rule.Port))
 	}
 
 	parts := []string{

@@ -75,8 +75,8 @@ func Default() *Config {
 		Database: DatabaseConfig{
 			Driver:   "sqlite",
 			SQLite:   SQLiteConfig{File: "data.db"},
-			MySQL:    MySQLConfig{Host: "127.0.0.1", Port: 3306, User: "openidcs", Database: "openidcs", Params: "charset=utf8mb4&parseTime=true&loc=Local"},
-			Postgres: PostgresConfig{Host: "127.0.0.1", Port: 5432, User: "openidcs", Database: "openidcs", SSLMode: "disable"},
+			MySQL:    MySQLConfig{Host: "127.0.0.1", Port: 3306, User: "quickidc", Database: "quickidc", Params: "charset=utf8mb4&parseTime=true&loc=Local"},
+			Postgres: PostgresConfig{Host: "127.0.0.1", Port: 5432, User: "quickidc", Database: "quickidc", SSLMode: "disable"},
 		},
 		Log: LogConfig{Console: "info", File: "debug", DB: "info"},
 	}
@@ -131,7 +131,7 @@ func Save(path string, cfg *Config) error {
 	if err := os.MkdirAll(filepath.Dir(path), 0o750); err != nil {
 		return err
 	}
-	header := "# OpenIDCS 运行配置（修改后重启生效）\n# database.driver: sqlite | mysql | postgres\n"
+	header := "# QuickIDC 运行配置（修改后重启生效）\n# database.driver: sqlite | mysql | postgres\n"
 	if err := os.WriteFile(path, append([]byte(header), data...), 0o600); err != nil {
 		return err
 	}
@@ -191,18 +191,18 @@ func NormalizeDriver(driver string) string {
 
 // ApplyEnv 用环境变量覆盖配置。
 func (c *Config) ApplyEnv() {
-	if v := os.Getenv("OPIDCS_HOST"); v != "" {
+	if v := os.Getenv("QUICKIDC_HOST"); v != "" {
 		c.Server.Host = v
 	}
-	if v := os.Getenv("OPIDCS_PORT"); v != "" {
+	if v := os.Getenv("QUICKIDC_PORT"); v != "" {
 		if n, err := strconv.Atoi(v); err == nil {
 			c.Server.Port = n
 		}
 	}
-	if v := os.Getenv("OPIDCS_DB_DRIVER"); v != "" {
+	if v := os.Getenv("QUICKIDC_DB_DRIVER"); v != "" {
 		c.Database.Driver = NormalizeDriver(v)
 	}
-	if v := os.Getenv("OPIDCS_DB_DSN"); v != "" {
+	if v := os.Getenv("QUICKIDC_DB_DSN"); v != "" {
 		c.Database.DSN = v
 	}
 	c.normalize()
@@ -216,9 +216,9 @@ func (c *DatabaseConfig) DSNString(dataDir string) (string, string, error) {
 		case "sqlite":
 			return "sqlite", c.DSN, nil
 		case "mysql":
-			return "opidcs-mysql", c.DSN, nil
+			return "quickidc-mysql", c.DSN, nil
 		case "postgres":
-			return "opidcs-postgres", c.DSN, nil
+			return "quickidc-postgres", c.DSN, nil
 		default:
 			return "", "", fmt.Errorf("不支持的数据库驱动: %s", c.Driver)
 		}
@@ -241,7 +241,7 @@ func (c *DatabaseConfig) DSNString(dataDir string) (string, string, error) {
 			params = "charset=utf8mb4&parseTime=true&loc=Local"
 		}
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?%s", m.User, m.Password, m.Host, m.Port, m.Database, params)
-		return "opidcs-mysql", dsn, nil
+		return "quickidc-mysql", dsn, nil
 	case "postgres":
 		p := c.Postgres
 		sslmode := p.SSLMode
@@ -257,7 +257,7 @@ func (c *DatabaseConfig) DSNString(dataDir string) (string, string, error) {
 		q := u.Query()
 		q.Set("sslmode", sslmode)
 		u.RawQuery = q.Encode()
-		return "opidcs-postgres", u.String(), nil
+		return "quickidc-postgres", u.String(), nil
 	default:
 		return "", "", fmt.Errorf("不支持的数据库驱动: %s", c.Driver)
 	}
