@@ -2,6 +2,7 @@ package cidata
 
 import (
 	"encoding/binary"
+	"os"
 	"strings"
 	"testing"
 	"unicode/utf16"
@@ -75,4 +76,24 @@ func decodeUTF16(b []byte) string {
 		units = append(units, binary.BigEndian.Uint16(b[i:]))
 	}
 	return string(utf16.Decode(units))
+}
+
+// WriteISO 必须能在没有 genisoimage/mkisofs 的机器上直接产出镜像。
+func TestWriteISOFile(t *testing.T) {
+	out := t.TempDir() + "/seed.iso"
+	files, err := Files(staticVM())
+	if err != nil {
+		t.Fatalf("生成内容失败: %v", err)
+	}
+	if err := WriteISO(out, files); err != nil {
+		t.Fatalf("打包失败: %v", err)
+	}
+	st, err := os.Stat(out)
+	if err != nil || st.Size() == 0 {
+		t.Fatalf("镜像未生成: %v", err)
+	}
+	if st.Size()%sectorSize != 0 {
+		t.Errorf("镜像大小不是扇区整数倍: %d", st.Size())
+	}
+	t.Logf("生成镜像 %d 字节", st.Size())
 }
