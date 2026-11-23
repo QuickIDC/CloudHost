@@ -1,6 +1,7 @@
 package service
 
 import (
+	"net/http/httptest"
 	"strings"
 	"testing"
 
@@ -270,5 +271,146 @@ func TestNetCheckRespectsV6Limit(t *testing.T) {
 	}
 	if nic.IP6Addr != "" {
 		t.Errorf("公网 IPv6 上限为 0，不应分配，实际 %q", nic.IP6Addr)
+	}
+}
+
+// /128 只有一个地址：数量配大了也只在第一个地址内分配，第二次必须失败，
+// 否则会把不属于这个前缀的地址发给实例。
+func TestAllocateIPv6SingleAddress(t *testing.T) {
+	pools := []ipPool{{
+		Name: "pub6", Vers: "ipv6", Type: "pub",
+		From: "240e:3b0:1234:5600::2", Nums: 5,
+		Gate: "240e:3b0:1234:5600::1", Prefix: 128,
+	}}
+	allocated := map[string]bool{}
+
+	ip, gate, mask, ok := allocateIP(pools, "ipv6", "pub", allocated)
+	if !ok {
+		t.Fatal("/128 池应能分配出唯一地址")
+	}
+	if ip != "240e:3b0:1234:5600::2" {
+		t.Errorf("应分配池首地址，实际 %q", ip)
+	}
+	if gate != "240e:3b0:1234:5600::1" {
+		t.Errorf("网关应为池里配置的地址，实际 %q", gate)
+	}
+	if mask != "128" {
+		t.Errorf("掩码应为前缀长度 128，实际 %q", mask)
+	}
+
+	allocated[ip] = true
+	if _, _, _, ok := allocateIP(pools, "ipv6", "pub", allocated); ok {
+		t.Error("/128 只有一个地址，不应继续分配下一个地址")
+	}
+}
+
+// /112 小段（段内只有 65536 个地址）：递增到段尾后必须停下，不能把段外地址分出去。
+func TestAllocateIPv6StopsAtPrefixBoundary(t *testing.T) {
+	pools := []ipPool{{
+		Name: "pub6", Vers: "ipv6", Type: "pub",
+		From: "2408:8207:1234:5600::fffe", Nums: 5, Prefix: 112,
+	}}
+	allocated := map[string]bool{}
+
+	if ip, _, _, ok := allocateIP(pools, "ipv6", "pub", allocated); !ok || ip != "2408:8207:1234:5600::fffe" {
+		t.Fatalf("第一个地址应为 ::fffe，实际 %q ok=%v", ip, ok)
+	}
+	allocated["2408:8207:1234:5600::fffe"] = true
+
+	if ip, _, _, ok := allocateIP(pools, "ipv6", "pub", allocated); !ok || ip != "2408:8207:1234:5600::ffff" {
+		t.Fatalf("第二个地址应为 ::ffff，实际 %q ok=%v", ip, ok)
+	}
+	allocated["2408:8207:1234:5600::ffff"] = true
+
+	if ip, _, _, ok := allocateIP(pools, "ipv6", "pub", allocated); ok {
+		t.Errorf("已越出 /112 网段，不应继续分配，实际又给出 %q", ip)
+	}
+}
+
+// 分配 IPv6 时要把地址池里的网关写进网卡，静态配置才有默认路由。
+func TestNetCheckFillsIPv6Gate(t *testing.T) {
+	const pools = `{"pub6":{"from":"240e:3b0:1234:5600::2","nums":2,"type":"pub","vers":"ipv6",` +
+		`"gate":"240e:3b0:1234:5600::1","prefix":128}}`
+	svc := newTestIPAllocService(t, pools)
+	vm := &model.VMConfig{
+		VmUUID: "vm-1",
+		NicAll: map[string]model.NCConfig{
+			"ethernet0": {NicName: "ethernet0", NicType: "pub"},
+		},
+	}
+	if err := svc.NetCheck("h1", vm); err != nil {
+		t.Fatalf("分配失败: %v", err)
+	}
+	nic := vm.NicAll["ethernet0"]
+	if nic.IP6Addr != "240e:3b0:1234:5600::2" {
+		t.Errorf("IPv6 地址应为池首地址，实际 %q", nic.IP6Addr)
+	}
+	if nic.IP6Gate != "240e:3b0:1234:5600::1" {
+		t.Errorf("IPv6 网关未回填，实际 %q", nic.IP6Gate)
+	}
+	if nic.IPv6PrefixLen() != 128 {
+		t.Errorf("前缀长度应为 128，实际 %d", nic.IPv6PrefixLen())
+	}
+}
+
+// IPv6 端到端：主控从地址池分配 → 回填网关与前缀 → 下发爱快 DHCPv6 静态绑定。
+func TestIPv6EndToEndAllocateAndBind(t *testing.T) {
+	f := &fakeRouter{ver: ikuaiVer3, sessKey: "k3"}
+	srv := httptest.NewServer(f.handler())
+	t.Cleanup(srv.Close)
+
+	db, err := data.NewDB(t.TempDir())
+	if err != nil {
+		t.Fatalf("创建临时数据库失败: %v", err)
+	}
+	t.Cleanup(func() { _ = db.Close() })
+
+	if err := db.CreateHost(&data.HSConfigRow{
+		HsName:     "h1",
+		ServerType: "PromoxSetup",
+		IKuaiAddr:  srv.URL,
+		IKuaiUser:  "admin",
+		IKuaiPass:  "pwd",
+		IPAddrMaps: `{"pub6":{"from":"240e:3b0:1234:5600::2","nums":2,"type":"pub",` +
+			`"vers":"ipv6","gate":"240e:3b0:1234:5600::1","prefix":64}}`,
+	}); err != nil {
+		t.Fatalf("写入主机配置失败: %v", err)
+	}
+
+	vm := &model.VMConfig{VmUUID: "vm-v6", NicAll: map[string]model.NCConfig{
+		"ethernet0": {NicName: "ethernet0", NicType: "pub"},
+	}}
+	if err := NewIPAllocService(db).NetCheck("h1", vm); err != nil {
+		t.Fatalf("分配 IPv6 失败: %v", err)
+	}
+
+	nic := vm.NicAll["ethernet0"]
+	if nic.IP6Addr != "240e:3b0:1234:5600::2" {
+		t.Fatalf("IPv6 地址应为池首地址，实际 %q", nic.IP6Addr)
+	}
+	if nic.IP6Gate != "240e:3b0:1234:5600::1" {
+		t.Errorf("IPv6 网关未回填，实际 %q", nic.IP6Gate)
+	}
+	if nic.IPv6PrefixLen() != 64 {
+		t.Errorf("前缀长度应为 64，实际 %d", nic.IPv6PrefixLen())
+	}
+	if nic.MacAddr == "" {
+		t.Fatal("MAC 应由 IPv6 地址推导出来，否则爱快绑定无从下发")
+	}
+
+	res, err := NewNATService(db).BindStaticForVM("h1", vm.VmUUID, vm)
+	if err != nil {
+		t.Fatalf("下发静态绑定失败: %v", err)
+	}
+	if res.BoundV6 != 1 {
+		t.Fatalf("应下发 1 条 IPv6 静态绑定，实际 %+v", res)
+	}
+
+	p := f.lastCallParam(t)
+	if strVal(p["mac"]) != nic.MacAddr {
+		t.Errorf("下发的 MAC 与网卡不一致：%v != %q", p["mac"], nic.MacAddr)
+	}
+	if strVal(p["suffix"]) != nic.IPv6Suffix() {
+		t.Errorf("下发的后缀应为 %q，实际 %q", nic.IPv6Suffix(), strVal(p["suffix"]))
 	}
 }

@@ -142,8 +142,11 @@ func (s *IPAllocService) NetCheck(hsName string, vm *model.VMConfig) error {
 
 		// 分配 IPv6：失败不报错（与 Python 一致）
 		if needV6 && allowV6 {
-			if ip, _, prefix, ok := allocateIP(pools, "ipv6", nicType, allocated); ok {
+			if ip, gate, prefix, ok := allocateIP(pools, "ipv6", nicType, allocated); ok {
 				nic.IP6Addr = ip
+				if strings.TrimSpace(nic.IP6Gate) == "" && gate != "" {
+					nic.IP6Gate = gate
+				}
 				// 前缀长度供爱快下发 DHCPv6 静态绑定与前端展示；
 				// 解析不出数字时保持 0，由 NCConfig.IPv6PrefixLen 按 /64 兜底。
 				if n, err := strconv.Atoi(strings.TrimSpace(prefix)); err == nil && n > 0 && n <= 128 {
@@ -300,6 +303,12 @@ func allocateIP(pools []ipPool, vers, nicType string, allocated map[string]bool)
 			if candidate == nil {
 				break
 			}
+			// IPv6 池的 prefix 是掩码长度：地址不能越出这个前缀。
+			// 例如 /128 只有一个地址，配了 nums>1 也只发第一个；
+			// /96 同理，越界的地址不属于这个网段，不能分给实例。
+			if vers == "ipv6" && pool.Prefix > 0 && !ipv6InPrefix(candidate, base, pool.Prefix) {
+				break
+			}
 			ipStr := candidate.String()
 			if !allocated[ipStr] {
 				return ipStr, pool.Gate, mask, true
@@ -307,6 +316,33 @@ func allocateIP(pools []ipPool, vers, nicType string, allocated map[string]bool)
 		}
 	}
 	return "", "", "", false
+}
+
+// ipv6InPrefix 判断 ip 与 base 是否落在同一个 /prefix 网段内。
+func ipv6InPrefix(ip, base net.IP, prefix int) bool {
+	if prefix <= 0 {
+		return true
+	}
+	if prefix > 128 {
+		return false
+	}
+	v, b := ip.To16(), base.To16()
+	if v == nil || b == nil {
+		return false
+	}
+	bits := prefix
+	for i := 0; i < 16 && bits > 0; i++ {
+		take := bits
+		if take > 8 {
+			take = 8
+		}
+		mask := byte(0xFF << uint(8-take))
+		if v[i]&mask != b[i]&mask {
+			return false
+		}
+		bits -= take
+	}
+	return true
 }
 
 // addIP 返回 base + n 的 IP

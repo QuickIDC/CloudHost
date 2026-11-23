@@ -55,6 +55,9 @@ type NCConfig struct {
 	// NicMask 的点分十进制形态无法表达 IPv6 前缀，因此单独保存；
 	// 为 0 时取 NicMask 的数字形态，仍为 0 则按 64 处理。
 	IP6Prefix int `json:"ip6_prefix"`
+	// IP6Gate IPv6 网关。IPv4 网关沿用 NicGate，IPv6 单独存一份，
+	// 静态配置时写进实例的默认路由（::/0）。
+	IP6Gate string `json:"ip6_gate"`
 }
 
 // EffectiveNicType 返回生效的网卡类型，缺省为 nat（与 Python 版一致）
@@ -611,7 +614,7 @@ type VMConfig struct {
 	//
 	// 计费方向、重置规则、超限后带宽属于「套餐/虚拟机」本身的策略；
 	// 上次重置时间戳则跟随单台虚拟机（FluLastRst），主机套餐里不设置它。
-	FluNum     int    `json:"flu_num"`     // 分配流量(MB)
+	FluNum     int    `json:"flu_num"`      // 分配流量(MB)
 	FluBillDir string `json:"flu_bill_dir"` // 计费方向：up=上行 down=下行 both=上下行（默认）
 	FluRstMode string `json:"flu_rst_mode"` // 重置模式：interval=每隔N天/周/月/年 calendar=每月X号/每周周X/每天X时
 	FluRstUnit string `json:"flu_rst_unit"` // 重置单位：interval 取 day/week/month/year；calendar 取 month/week/day

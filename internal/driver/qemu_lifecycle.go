@@ -700,25 +700,9 @@ func (d *QEMUDriver) writeCloudInitSeed(cfg *model.VMConfig) string {
 	}
 	// cloud-init 的 netplan 配置在 Debian 云镜像里可能没有 netplan 渲染器，
 	// 直接写 systemd-networkd 配置最稳；同时保留 network-config 供支持的镜像使用。
-	nicName := "en*"
-	staticLine := ""
-	for _, nic := range cfg.NicAll {
-		if strings.TrimSpace(nic.IP4Addr) != "" {
-			prefix := "/24"
-			if strings.TrimSpace(nic.NicMask) != "" {
-				prefix = "/" + strings.TrimPrefix(strings.TrimSpace(nic.NicMask), "/")
-			}
-			gw := strings.TrimSpace(nic.NicGate)
-			staticLine = fmt.Sprintf("Address=%s%s\nGateway=%s\nDNS=%s\n", nic.IP4Addr, prefix, gw, gw)
-			break
-		}
-	}
-	netBody := "[Match]\nName=" + nicName + "\n[Network]\n"
-	if staticLine == "" {
-		netBody += "DHCP=yes\n"
-	} else {
-		netBody += staticLine
-	}
+	// IPv4 与 IPv6 都写进去，实例开机即是主控分配的地址，不依赖 DHCP/DHCPv6。
+	netConf := buildCloudInitNetwork(cfg)
+	netBody := netConf.Networkd
 
 	userData := fmt.Sprintf(`#cloud-config
 hostname: %s
@@ -744,17 +728,7 @@ runcmd:
 
 	metaData := fmt.Sprintf("instance-id: %s\nlocal-hostname: %s\n", cfg.VmUUID, cfg.VmUUID)
 
-	networkConfig := `version: 2
-ethernets:
-  primary:
-    match:
-      name: "en*"
-`
-	if staticLine == "" {
-		networkConfig += "    dhcp4: true\n"
-	} else {
-		networkConfig += "    dhcp4: false\n"
-	}
+	networkConfig := netConf.Netplan
 	if err := d.writeHostFile(tmp+"/user-data", userData, 0600); err != nil {
 		return ""
 	}

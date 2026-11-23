@@ -159,6 +159,12 @@ func (d *LXDDriver) CreateVM(cfg *model.VMConfig) (*model.ZMessage, error) {
 	if d.Config.NetworkNat != "" {
 		_, _ = d.execLXC("config", "device", "set", cfg.VmUUID, "eth0", "network", d.Config.NetworkNat)
 	}
+	// 静态 IPv6：LXD 的 nic 设备支持 ipv6.address。老版本或没开 v6 的网络会报错，
+	// 失败时保持原来的 DHCPv6 行为，不影响容器创建。
+	if nic, ok := firstNICWithIPv6(cfg); ok {
+		_, _ = d.execLXC("config", "device", "set", cfg.VmUUID, "eth0",
+			"ipv6.address", fmt.Sprintf("%s/%d", strings.TrimSpace(nic.IP6Addr), nic.IPv6PrefixLen()))
+	}
 
 	cfg.VmFlag = model.VMPowerStarted
 	d.mu.Lock()
