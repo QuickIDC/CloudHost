@@ -101,10 +101,48 @@ jobs:
           echo "name=${name}" >> "$GITHUB_OUTPUT"
 
   # ==========================================================================
+  # 前端静态资源：从 QuickIDC/FrontPage 构建，供 Linux/Windows 包内嵌使用
+  # （CloudHost 仓库 .gitignore 忽略 static/，必须在此处构建，否则打包缺 UI）
+  # ==========================================================================
+  build-frontend:
+    needs: prepare
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: QuickIDC/FrontPage
+          path: frontend
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build frontend
+        working-directory: frontend
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run build
+          test -f dist/index.html
+
+      - name: Package static
+        run: |
+          set -euo pipefail
+          tar -czf static.tar.gz -C frontend/dist .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frontend-static
+          path: static.tar.gz
+          if-no-files-found: error
+
+  # ==========================================================================
   # 主控 HostAgent：Linux amd64 / arm64（纯 Go，无 CGO）
   # ==========================================================================
   build-linux:
-    needs: prepare
+    needs: [prepare, build-frontend]
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
@@ -118,18 +156,35 @@ jobs:
           go-version-file: go.mod
           cache: true
 
+      - name: Fetch static assets
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-static
+          path: .
+
+      - name: Extract static assets
+        run: |
+          set -euo pipefail
+          mkdir -p static
+          tar -xzf static.tar.gz -C static
+          test -f static/index.html
+
       - name: Build
         env:
           CGO_ENABLED: '0'
           GOOS: linux
           GOARCH: ${{ matrix.arch }}
         run: |
-          mkdir -p dist pkg
+          set -euo pipefail
+          mkdir -p dist
           go build -trimpath -ldflags "-s -w" -v -o dist/hostagent ./cmd/server
+          rm -rf pkg && mkdir -p pkg
           cp dist/hostagent pkg/
           cp -R static pkg/
           cp -R VNCConsole pkg/
-          tar -C pkg -czf "dist/hostagent-linux-${{ matrix.arch }}.tar.gz" hostagent static VNCConsole
+          # 注意：-C 必须放在 -f 之前，否则归档路径会被解析到 pkg/ 下
+          tar -czf "dist/hostagent-linux-${{ matrix.arch }}.tar.gz" -C pkg hostagent static VNCConsole
+          tar -tzf "dist/hostagent-linux-${{ matrix.arch }}.tar.gz" | grep -qx 'static/index.html'
 
       - uses: actions/upload-artifact@v4
         with:
@@ -141,7 +196,7 @@ jobs:
   # 主控 HostAgent：Windows amd64（Inno Setup + NSSM）
   # ==========================================================================
   build-windows:
-    needs: prepare
+    needs: [prepare, build-frontend]
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -150,6 +205,20 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
+
+      - name: Fetch static assets
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-static
+          path: .
+
+      - name: Extract static assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p static
+          tar -xzf static.tar.gz -C static
+          test -f static/index.html
 
       - name: Install Inno Setup
         shell: pwsh
@@ -182,8 +251,13 @@ jobs:
       - name: Package portable zip
         shell: pwsh
         run: |
+          if (-not (Test-Path "static\index.html")) { throw "缺少 static\index.html，前端产物未就绪" }
           Compress-Archive -Path dist\hostagent.exe, static, VNCConsole -DestinationPath "dist\hostagent-windows-amd64.zip" -Force
-          Copy-Item "BuildCache\windows\*.exe" dist\ -Force
+          if (Test-Path "BuildCache\windows\*.exe") {
+            Copy-Item "BuildCache\windows\*.exe" dist\ -Force
+          } else {
+            Write-Host "BuildCache\windows 下无 exe，跳过复制"
+          }
 
       - uses: actions/upload-artifact@v4
         with:
@@ -360,7 +434,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - runner: macos-14
+          - runner: macos-latest
             triple: aarch64-apple-darwin
             goarch: arm64
             suffix: arm64
@@ -425,18 +499,30 @@ jobs:
   publish:
     needs:
       - prepare
+      - build-frontend
       - build-linux
       - build-windows
       - build-quickidc
       - build-gui-windows
       - build-gui-linux
       - build-gui-macos
+    # 主控 Linux 包是安装脚本的硬依赖：只要它成功就发布，
+    # GUI/Windows 等可选产物失败不应连带导致 install.sh 404
+    if: always() && needs.prepare.result == 'success' && needs.build-linux.result == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           path: dist
           merge-multiple: true
+
+      - name: Prune build-only artifacts
+        run: |
+          set -euo pipefail
+          rm -f dist/static.tar.gz
+          test -f dist/hostagent-linux-amd64.tar.gz || { echo "缺少 hostagent-linux-amd64.tar.gz"; exit 1; }
+          test -f dist/hostagent-linux-arm64.tar.gz || { echo "缺少 hostagent-linux-arm64.tar.gz"; exit 1; }
 
       - name: List artifacts
         run: ls -lh dist

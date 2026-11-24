@@ -78,8 +78,12 @@ else
     tag="beta"
   else
     echo "==> 查询最新稳定版"
-    tag="$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" \
-      | grep -o '"tag_name"[[:space:]]*:[[:space:]]*"[^"]*"' | head -n1 | cut -d'"' -f4)"
+    tag="$( { curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" || true; } \
+      | grep -o '"tag_name"[[:space:]]*:[[:space:]]*"[^"]*"' | head -n1 | cut -d'"' -f4 || true)"
+    if [[ -z "${tag}" ]]; then
+      echo "==> 未找到正式版，回退到 beta 通道"
+      tag="beta"
+    fi
   fi
   if [[ -z "${tag}" ]]; then
     echo "无法确定版本，请用 --version 指定" >&2

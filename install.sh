@@ -2,7 +2,7 @@
 # ============================================================================
 # QuickIDC HostAgent (Go) Linux 一键安装脚本
 #
-# 在线安装（默认最新正式版）:
+# 在线安装（默认最新正式版，无正式版时自动回退 beta 通道）:
 #   curl -fsSL https://idcgit.opkg.cn/install.sh | sudo bash
 #
 # 指定版本 / 端口 / 目录:
@@ -31,6 +31,7 @@ PORT="${DEFAULT_PORT}"
 PORT_EXPLICIT=0
 VERSION="latest"
 OFFLINE_FILE=""
+INSTALL_CHANNEL=""
 DO_UNINSTALL=0
 PURGE=0
 OPEN_FIREWALL=0
@@ -98,13 +99,18 @@ do_uninstall() {
 }
 
 # ======================== 下载 ========================
-build_url() {
+# 生成指定通道/版本的下载地址
+#   latest -> GitHub 正式版（非预发布）的 /releases/latest
+#   beta   -> 滚动预发布通道（tag=beta，随 main 自动构建）
+#   其它   -> 指定 tag（自动补 v 前缀）
+build_url_for() {
+    local ver="$1"
     local asset="hostagent-linux-${ARCH}.tar.gz"
-    if [[ "${VERSION}" == "latest" || -z "${VERSION}" ]]; then
+    if [[ -z "${ver}" || "${ver}" == "latest" ]]; then
         echo "https://github.com/${REPO}/releases/latest/download/${asset}"
     else
-        local tag="${VERSION}"
-        [[ "${tag}" == v* ]] || tag="v${tag}"
+        local tag="${ver}"
+        [[ "${tag}" == v* || "${tag}" == "beta" ]] || tag="v${tag}"
         echo "https://github.com/${REPO}/releases/download/${tag}/${asset}"
     fi
 }
@@ -133,10 +139,33 @@ do_install() {
         [[ -f "${OFFLINE_FILE}" ]] || die "离线包不存在: ${OFFLINE_FILE}"
         cp -f "${OFFLINE_FILE}" "${tmp}/pkg.tar.gz"
     else
-        local url
-        url="$(build_url)"
-        info "下载: ${url}"
-        download "${url}" "${tmp}/pkg.tar.gz" || die "下载失败，请检查版本号或网络"
+        # 默认优先正式版；仓库尚无正式版（只有 beta 预发布）时自动回退，
+        # 否则 /releases/latest 会直接 404 导致一键安装失败
+        local candidates=()
+        if [[ -z "${VERSION}" || "${VERSION}" == "latest" ]]; then
+            candidates=("latest" "beta")
+        else
+            candidates=("${VERSION}")
+        fi
+
+        local ok=0 ver url
+        for ver in "${candidates[@]}"; do
+            url="$(build_url_for "${ver}")"
+            info "下载: ${url}"
+            if download "${url}" "${tmp}/pkg.tar.gz"; then
+                ok=1
+                break
+            fi
+            warn "下载失败: ${url}"
+        done
+
+        if [[ ${ok} -ne 1 ]]; then
+            error "未找到可用的安装包（尝试通道: ${candidates[*]}）"
+            error "请检查网络，或用 --version <tag> 指定版本、--file <包路径> 离线安装"
+            exit 1
+        fi
+        [[ "${ver}" != "latest" ]] && warn "正式版不可用，已回退到 ${ver} 通道"
+        INSTALL_CHANNEL="${ver}"
     fi
 
     info "解压安装包 ..."
@@ -168,6 +197,7 @@ do_install() {
 
     cat > "${PREFIX}/.install_info" <<EOF
 INSTALL_VERSION=${VERSION}
+INSTALL_CHANNEL=${INSTALL_CHANNEL:-${VERSION}}
 INSTALL_ARCH=${ARCH}
 INSTALL_DATE=$(date '+%Y-%m-%d %H:%M:%S')
 INSTALL_PORT=${PORT}
