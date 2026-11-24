@@ -184,7 +184,10 @@ jobs:
           cp -R VNCConsole pkg/
           # 注意：-C 必须放在 -f 之前，否则归档路径会被解析到 pkg/ 下
           tar -czf "dist/hostagent-linux-${{ matrix.arch }}.tar.gz" -C pkg hostagent static VNCConsole
-          tar -tzf "dist/hostagent-linux-${{ matrix.arch }}.tar.gz" | grep -qx 'static/index.html'
+          # 校验包内含前端入口（先落盘再 grep，避免 grep -q 提前退出触发 SIGPIPE + pipefail）
+          tar -tzf "dist/hostagent-linux-${{ matrix.arch }}.tar.gz" > dist/manifest.txt
+          grep -qx 'static/index.html' dist/manifest.txt
+          rm -f dist/manifest.txt
 
       - uses: actions/upload-artifact@v4
         with:
@@ -234,14 +237,45 @@ jobs:
           New-Item -ItemType Directory -Force dist | Out-Null
           go build -trimpath -ldflags "-s -w" -v -o dist/hostagent.exe ./cmd/server
 
+      # nssm.cc 在国内/海外 runner 上时常不可达：优先用 choco，其次直连下载，
+      # 两者都失败时只跳过安装包（便携 zip 不依赖 nssm）
       - name: Fetch NSSM
+        id: nssm
         shell: pwsh
+        continue-on-error: true
         run: |
-          Invoke-WebRequest -Uri "https://nssm.cc/release/nssm-2.24.zip" -OutFile nssm.zip
-          Expand-Archive nssm.zip -DestinationPath nssm -Force
-          Copy-Item "nssm\nssm-2.24\win64\nssm.exe" "packaging\windows\nssm.exe" -Force
+          $ErrorActionPreference = "Continue"
+          $dest = "packaging\windows\nssm.exe"
+
+          choco install nssm -y --no-progress
+          $candidates = @(
+            "C:\ProgramData\chocolatey\lib\nssm\tools\nssm.exe",
+            "C:\ProgramData\chocolatey\bin\nssm.exe"
+          )
+          $found = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+
+          if (-not $found) {
+            try {
+              curl.exe -fsSL --retry 3 --connect-timeout 20 -o nssm.zip "https://nssm.cc/release/nssm-2.24.zip"
+              if ($LASTEXITCODE -ne 0) { throw "curl 失败: $LASTEXITCODE" }
+              Expand-Archive nssm.zip -DestinationPath nssm -Force
+              $found = "nssm\nssm-2.24\win64\nssm.exe"
+            } catch {
+              Write-Host "nssm.cc 下载失败: $_"
+            }
+          }
+
+          if (-not $found -or -not (Test-Path $found)) {
+            Write-Host "未能获取 nssm.exe，本次跳过 Windows 安装包（便携 zip 不受影响）"
+            exit 1
+          }
+          Copy-Item $found $dest -Force
+          Write-Host "已就绪: $dest"
+          # choco 失败会留下非零 LASTEXITCODE，pwsh 包装器会据此判定整步失败
+          $global:LASTEXITCODE = 0
 
       - name: Build Inno Setup installer
+        if: steps.nssm.outcome == 'success'
         shell: pwsh
         run: |
           $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
@@ -265,7 +299,7 @@ jobs:
           path: |
             dist/hostagent-windows-amd64.zip
             dist/*-setup.exe
-          if-no-files-found: error
+          if-no-files-found: warn
 
   # ==========================================================================
   # quickidc CLI：Linux / macOS / Windows
